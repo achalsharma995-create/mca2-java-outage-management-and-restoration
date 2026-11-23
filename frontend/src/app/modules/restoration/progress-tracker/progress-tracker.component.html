@@ -1,0 +1,61 @@
+<div class="progress-tracker-container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="fw-bold mb-0">Field Restoration Progress Tracker</h4>
+      <small class="text-muted">Chronological milestone tracking and automatic closure on 100% completion</small>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Form -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm p-4 bg-white rounded-3">
+        <h5 class="fw-bold mb-3"><i class="bi bi-sliders text-primary me-2"></i>Post Milestone</h5>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between">
+            <label class="form-label small fw-semibold">Progress Percentage</label>
+            <strong class="text-primary font-mono">{{ percentage }}%</strong>
+          </div>
+          <input type="range" class="form-range" [(ngModel)]="percentage" min="0" max="100" step="5">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Milestone Category</label>
+          <select class="form-select" [(ngModel)]="statusReached">
+            <option value="SITE_ASSESSMENT">Site Assessment</option>
+            <option value="VEGETATION_CLEARED">Vegetation Cleared</option>
+            <option value="CONDUCTOR_SPLICED">Conductor Spliced</option>
+            <option value="COMPONENT_REPLACED">Component Replaced</option>
+            <option value="ENERGIZED_AND_RESTORED">Energized &amp; Restored (100%)</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Field Remarks</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="remarks" placeholder="Enter restoration details and safety notes..."></textarea>
+        </div>
+
+        <button class="btn btn-primary w-100 fw-semibold" (click)="submitProgress()">Submit Milestone</button>
+      </div>
+    </div>
+
+    <!-- Timeline View -->
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm p-4 bg-white rounded-3">
+        <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-muted me-2"></i>Incident Restoration Timeline</h5>
+        
+        <div class="timeline ps-3 border-start border-2 border-primary">
+          <div class="timeline-item mb-3 position-relative ps-3" *ngFor="let t of timeline">
+            <div class="d-flex justify-content-between align-items-center">
+              <strong class="text-primary small">{{ t.statusReached }}</strong>
+              <small class="text-muted font-mono">{{ t.createdAt }}</small>
+            </div>
+            <div class="small text-dark mt-1">{{ t.remarks }}</div>
+            <span class="badge bg-primary font-mono mt-1" style="font-size: 0.7rem;">{{ t.percentageComplete }}% Complete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

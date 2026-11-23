@@ -1,0 +1,97 @@
+// Modern Utility Theme for Energy & Utilities OMRS
+$primary: #0284c7;       // Electric Blue
+$secondary: #475569;     // Slate Gray
+$success: #10b981;       // Emerald Green (Restored)
+$warning: #f59e0b;       // Amber (In Progress / Dispatched)
+$danger: #ef4444;        // Crimson Red (Critical / Outage)
+$info: #06b6d4;          // Cyan
+
+:root {
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-family);
+  color: #1e293b;
+  background-color: #f8fafc;
+  margin: 0;
+  padding: 0;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+// App Layout Shell
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 1.5rem 2rem;
+}
+
+// Cards
+.card-omrs {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  }
+}
+
+// Badges
+.badge-status-reported { background-color: #fee2e2; color: #991b1b; }
+.badge-status-verified { background-color: #fef3c7; color: #92400e; }
+.badge-status-in-progress { background-color: #e0f2fe; color: #075985; }
+.badge-status-restored { background-color: #d1fae5; color: #065f46; }
+.badge-status-cancelled { background-color: #f1f5f9; color: #475569; }
+
+.badge-sev-critical { background-color: #dc2626; color: #ffffff; }
+.badge-sev-high { background-color: #ea580c; color: #ffffff; }
+.badge-sev-medium { background-color: #d97706; color: #ffffff; }
+.badge-sev-low { background-color: #0284c7; color: #ffffff; }
+
+// Stepper Timeline
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  border-left: 2px solid #e2e8f0;
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -2.45rem;
+      top: 0.25rem;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #0284c7;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px #0284c7;
+    }
+
+    &.completed::before {
+      background: #10b981;
+      box-shadow: 0 0 0 2px #10b981;
+    }
+  }
+}

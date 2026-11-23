@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GridFlow OMRS - Outage Management & Restoration System</title>
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --secondary: #475569;
+      --bg-surface: #ffffff;
+      --bg-canvas: #f8fafc;
+      --border-color: #e2e8f0;
+      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-canvas);
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    .font-mono { font-family: var(--font-mono); }
+
+    /* Navbar */
+    .navbar-omrs {
+      background: #0f172a;
+      border-bottom: 3px solid var(--primary);
+    }
+    .brand-badge {
+      font-size: 0.7rem;
+      background: rgba(2, 132, 199, 0.25);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    /* Metric Cards */
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card:hover {
+      box-shadow: 0 6px 12px rgba(0,0,0,0.07);
+      transform: translateY(-2px);
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+    }
+    .metric-card.red::before { background: #ef4444; }
+    .metric-card.green::before { background: #10b981; }
+    .metric-card.blue::before { background: #0284c7; }
+    .metric-card.amber::before { background: #f59e0b; }
+
+    .metric-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    /* Status Badges */
+    .badge-status {
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+    }
+    .badge-REPORTED { background: #fee2e2; color: #991b1b; }
+    .badge-VERIFIED { background: #fef3c7; color: #92400e; }
+    .badge-IN_PROGRESS { background: #e0f2fe; color: #0369a1; }
+    .badge-RESTORED { background: #d1fae5; color: #065f46; }
+    .badge-CANCELLED { background: #f1f5f9; color: #475569; }
+
+    .badge-sev-CRITICAL { background: #dc2626; color: #fff; }
+    .badge-sev-HIGH { background: #ea580c; color: #fff; }
+    .badge-sev-MEDIUM { background: #d97706; color: #fff; }
+    .badge-sev-LOW { background: #0284c7; color: #fff; }
+
+    .badge-crew-AVAILABLE { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-crew-DISPATCHED { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge-crew-ON_DUTY { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-crew-MAINTENANCE { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+    /* Nav Tabs */
+    .nav-tabs-omrs .nav-link {
+      font-weight: 600;
+      color: #64748b;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 3px solid transparent;
+      border-radius: 0;
+    }
+    .nav-tabs-omrs .nav-link:hover {
+      color: var(--primary);
+      border-color: transparent;
+    }
+    .nav-tabs-omrs .nav-link.active {
+      color: var(--primary);
+      background: transparent;
+      border-bottom: 3px solid var(--primary);
+    }
+
+    /* Stepper Timeline */
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin: 1.5rem 0;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: #e2e8f0;
+      z-index: 1;
+    }
+    .step-node {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      background: var(--bg-surface);
+      padding: 0 0.5rem;
+    }
+    .step-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #64748b;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.35rem;
+      border: 3px solid var(--bg-surface);
+    }
+    .step-node.active .step-circle {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2);
+    }
+    .step-node.completed .step-circle {
+      background: #10b981;
+      color: #fff;
+    }
+
+    .timeline-log {
+      position: relative;
+      padding-left: 1.75rem;
+      border-left: 2px solid #e2e8f0;
+    }
+    .timeline-log-item {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+    .timeline-log-item::before {
+      content: '';
+      position: absolute;
+      left: -2.15rem;
+      top: 0.25rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    /* Live Toast Notification */
+    .toast-container-omrs {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION BAR -->
+  <!-- ========================================================================= -->
+  <nav class="navbar navbar-dark navbar-omrs px-4 py-2 sticky-top shadow-sm">
+    <div class="container-fluid p-0 d-flex justify-content-between align-items-center">
+      
+      <!-- Brand -->
+      <div class="d-flex align-items-center gap-3">
+        <a class="navbar-brand m-0 d-flex align-items-center gap-2 fw-bold fs-5" href="#">
+          <i class="bi bi-lightning-charge-fill text-warning fs-4"></i>
+          <span>GridFlow <span class="text-info">OMRS</span></span>
+        </a>
+        <span class="brand-badge text-uppercase d-none d-md-inline-block">Energy & Utilities J16</span>
+      </div>
+
+      <!-- Right Toolbar -->
+      <div class="d-flex align-items-center gap-3">
+        
+        <!-- Live Role Switcher (For Mentor Demonstration) -->
+        <div class="d-flex align-items-center bg-dark rounded px-2 py-1 border border-secondary">
+          <small class="text-light me-2 fw-semibold d-none d-sm-inline">
+            <i class="bi bi-person-badge text-info me-1"></i>Role:
+          </small>
+          <select id="roleSwitcher" class="form-select form-select-sm bg-secondary text-white border-0 fw-semibold" onchange="onRoleChange(this.value)">
+            <option value="ROLE_ADMIN">Control Room Operator (Admin)</option>
+            <option value="ROLE_FIELD_ENGINEER">Field Engineer (Marcus Vance)</option>
+            <option value="ROLE_CUSTOMER">Customer Portal (John Doe)</option>
+          </select>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="btn btn-outline-light position-relative btn-sm px-2" onclick="switchTab('notifications-tab')">
+          <i class="bi bi-bell-fill"></i>
+          <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            4
+          </span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="d-flex align-items-center gap-2 text-white border-start border-secondary ps-3">
+          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.85rem;" id="userAvatar">
+            AM
+          </div>
+          <div class="d-none d-lg-block text-start" style="line-height: 1.2;">
+            <div class="fw-bold small" id="userNameLabel">Alex Morgan</div>
+            <div class="text-muted" style="font-size: 0.72rem;" id="userRoleLabel">Chief Grid Controller</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTAINER -->
+  <!-- ========================================================================= -->
+  <div class="container-fluid px-4 py-3">
+
+    <!-- METRICS HEADER (SUMMARY CARDS) -->
+    <div class="row g-3 mb-4">
+      
+      <!-- Card 1: Active Outages -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="metric-card red">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Active Incidents</div>
+              <h2 class="fw-bold my-1 text-danger" id="metricActiveOutages">6</h2>
+              <small class="text-muted"><i class="bi bi-exclamation-triangle text-danger me-1"></i>2 Critical, 3 High</small>
+            </div>
+            <div class="metric-icon bg-danger-subtle text-danger">
+              <i class="bi bi-lightning-slash-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Crews Available -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="metric-card blue">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Restoration Crews</div>
+              <h2 class="fw-bold my-1 text-primary" id="metricAvailableCrews">4 <span class="fs-6 text-muted fw-normal">/ 8 ready</span></h2>
+              <small class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i>50% Fleet Dispatched</small>
+            </div>
+            <div class="metric-icon bg-primary-subtle text-primary">
+              <i class="bi bi-truck-front-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Restored Today -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="metric-card green">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Restored Today</div>
+              <h2 class="fw-bold my-1 text-success" id="metricRestoredToday">5</h2>
+              <small class="text-muted"><i class="bi bi-clock-history me-1"></i>Avg Duration: 152 min</small>
+            </div>
+            <div class="metric-icon bg-success-subtle text-success">
+              <i class="bi bi-shield-fill-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Customers Impacted -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="metric-card amber">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Affected Customers</div>
+              <h2 class="fw-bold my-1 text-warning" id="metricAffectedCust">6,245</h2>
+              <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>Across 4 Sub-stations</small>
+            </div>
+            <div class="metric-icon bg-warning-subtle text-warning">
+              <i class="bi bi-people-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODULE NAVIGATION TABS -->
+    <ul class="nav nav-tabs nav-tabs-omrs mb-4" id="mainTab" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" id="outages-tab" data-bs-toggle="tab" data-bs-target="#outages-content" type="button">
+          <i class="bi bi-lightning me-1"></i> Outages & Reporting
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="crews-tab" data-bs-toggle="tab" data-bs-target="#crews-content" type="button">
+          <i class="bi bi-truck me-1"></i> Crew Dispatch & Work Orders
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress-content" type="button">
+          <i class="bi bi-speedometer2 me-1"></i> Restoration Progress Tracker
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-content" type="button">
+          <i class="bi bi-chat-dots me-1"></i> Customer Notifications
+        </button>
+      </li>
+    </ul>
+
+    <!-- TAB CONTENTS -->
+    <div class="tab-content" id="mainTabContent">
+
+      <!-- ===================================================================== -->
+      <!-- TAB 1: OUTAGE DETECTION & REPORTING -->
+      <!-- ===================================================================== -->
+      <div class="tab-pane fade show active" id="outages-content">
+        
+        <!-- Controls Bar -->
+        <div class="card bg-white border-0 shadow-sm rounded-3 p-3 mb-3">
+          <div class="row g-2 align-items-center">
+            
+            <div class="col-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="outageSearchInput" class="form-control bg-light border-start-0" placeholder="Search by Outage ID, Area, Feeder, or Cause..." onkeyup="filterOutages()">
+              </div>
+            </div>
+
+            <div class="col-6 col-md-2">
+              <select id="filterStatus" class="form-select" onchange="filterOutages()">
+                <option value="ALL">All Statuses</option>
+                <option value="REPORTED">REPORTED</option>
+                <option value="VERIFIED">VERIFIED</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="RESTORED">RESTORED</option>
+              </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+              <select id="filterArea" class="form-select" onchange="filterOutages()">
+                <option value="ALL">All Areas</option>
+                <option value="Green Valley Suburbs">Green Valley Suburbs</option>
+                <option value="East Bay Waterfront">East Bay Waterfront</option>
+                <option value="North Industrial Corridor">North Industrial Corridor</option>
+                <option value="Downtown Financial District">Downtown Financial</option>
+                <option value="West Hills Commercial Hub">West Hills</option>
+                <option value="South Tech Park">South Tech Park</option>
+              </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+              <select id="filterSeverity" class="form-select" onchange="filterOutages()">
+                <option value="ALL">All Severities</option>
+                <option value="CRITICAL">CRITICAL</option>
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+              </select>
+            </div>
+
+            <div class="col-6 col-md-2 text-end">
+              <button class="btn btn-danger w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#reportOutageModal">
+                <i class="bi bi-plus-circle me-1"></i> Report Outage
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Outage Grid Table -->
+        <div class="card bg-white border-0 shadow-sm rounded-3 overflow-hidden">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                  <th class="ps-3">Incident #</th>
+                  <th>Incident Title & Description</th>
+                  <th>Area & Feeder</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                  <th>Impact</th>
+                  <th>Reports</th>
+                  <th>Reported Time</th>
+                  <th>ETR</th>
+                  <th class="text-end pe-3">Action</th>
+                </tr>
+              </thead>
+              <tbody id="outageTableBody">
+                <!-- Dynamically populated via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 2: CREW DISPATCH & WORK ORDERS -->
+      <!-- ===================================================================== -->
+      <div class="tab-pane fade" id="crews-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="fw-bold mb-0">Restoration Fleet & Crew Status</h5>
+            <small class="text-muted">Real-time crew availability, active vehicles, and dispatch assignment</small>
+          </div>
+          <button class="btn btn-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#dispatchModal">
+            <i class="bi bi-send-plus me-1"></i> Create & Dispatch Work Order
+          </button>
+        </div>
+
+        <!-- Crews Fleet Grid -->
+        <div class="row g-3 mb-4" id="crewsCardGrid">
+          <!-- Dynamically populated with 8 realistic crews -->
+        </div>
+
+        <!-- Active Work Orders Table -->
+        <div class="card bg-white border-0 shadow-sm rounded-3 overflow-hidden">
+          <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0"><i class="bi bi-card-checklist text-primary me-2"></i>Active Restoration Work Orders</h6>
+            <span class="badge bg-primary-subtle text-primary fw-semibold" id="woCountBadge">3 Active</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                  <th class="ps-3">Work Order #</th>
+                  <th>Outage #</th>
+                  <th>Assigned Crew</th>
+                  <th>Vehicle</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Assigned At</th>
+                  <th>Est Duration</th>
+                  <th class="text-end pe-3">Update Lifecycle</th>
+                </tr>
+              </thead>
+              <tbody id="workOrderTableBody">
+                <!-- Populated via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 3: RESTORATION PROGRESS TRACKER -->
+      <!-- ===================================================================== -->
+      <div class="tab-pane fade" id="progress-content">
+        
+        <div class="row g-4">
+          
+          <!-- Left: Outage Selector & Progress Entry Form -->
+          <div class="col-12 col-lg-5">
+            <div class="card bg-white border-0 shadow-sm rounded-3 p-4">
+              <h5 class="fw-bold mb-1"><i class="bi bi-sliders text-primary me-2"></i>Post Field Progress Update</h5>
+              <p class="text-muted small mb-3">Field Engineers post milestone percentages, remarks, and revised ETR.</p>
+
+              <form id="progressForm" onsubmit="submitProgressUpdate(event)">
+                
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Select Active Incident / Work Order</label>
+                  <select id="progressOutageSelect" class="form-select" onchange="onSelectProgressOutage(this.value)">
+                    <!-- Options populated via JS -->
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between">
+                    <label class="form-label fw-semibold small">Completion Percentage</label>
+                    <span class="fw-bold text-primary font-mono" id="sliderValDisplay">40%</span>
+                  </div>
+                  <input type="range" class="form-range" id="progressSlider" min="0" max="100" step="5" value="40" oninput="document.getElementById('sliderValDisplay').innerText = this.value + '%'">
+                  <div class="d-flex justify-content-between text-muted" style="font-size: 0.72rem;">
+                    <span>0% (Dispatched)</span>
+                    <span>50% (Splicing/Repairs)</span>
+                    <span>100% (Restored & Closed)</span>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Milestone Status Reached</label>
+                  <select id="progressStatusReached" class="form-select">
+                    <option value="SITE_ASSESSMENT">Site Assessment & Hazard Cordoning</option>
+                    <option value="VEGETATION_CLEARED">Vegetation / Tree Clearing Completed</option>
+                    <option value="CABLE_SPLICED">Conductor Splicing & Insulation Rigging</option>
+                    <option value="COMPONENT_REPLACED">Transformer / Cutout Fuse Replaced</option>
+                    <option value="HIPOT_TESTING">Hipot & Insulation Resistance Testing</option>
+                    <option value="ENERGIZED_AND_RESTORED">Feeder Energized & Voltage Verified (100%)</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Field Remarks / Technical Notes</label>
+                  <textarea id="progressRemarks" class="form-control" rows="3" placeholder="Describe restoration work executed, safety clearances, and tests completed..." required></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Updated Estimated Restoration Time (ETR)</label>
+                  <input type="datetime-local" id="progressEtr" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                  <i class="bi bi-cloud-arrow-up-fill me-1"></i> Submit Progress Milestone
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+          <!-- Right: Interactive Milestone Stepper & Chronological Timeline -->
+          <div class="col-12 col-lg-7">
+            <div class="card bg-white border-0 shadow-sm rounded-3 p-4">
+              
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <h5 class="fw-bold mb-0" id="timelineTitle">OUT-2026-0001 Timeline</h5>
+                  <span class="text-muted small" id="timelineSubtitle">Fallen Pine Tree Across 11kV Feeder Line</span>
+                </div>
+                <span class="badge-status badge-IN_PROGRESS" id="timelineStatusBadge">IN_PROGRESS</span>
+              </div>
+
+              <!-- Visual Stepper Progress -->
+              <div class="stepper" id="visualStepper">
+                <div class="step-node completed" id="step1">
+                  <div class="step-circle"><i class="bi bi-flag-fill"></i></div>
+                  <div class="small fw-semibold">Reported</div>
+                </div>
+                <div class="step-node completed" id="step2">
+                  <div class="step-circle"><i class="bi bi-check-lg"></i></div>
+                  <div class="small fw-semibold">Verified</div>
+                </div>
+                <div class="step-node completed" id="step3">
+                  <div class="step-circle"><i class="bi bi-truck"></i></div>
+                  <div class="small fw-semibold">Dispatched</div>
+                </div>
+                <div class="step-node active" id="step4">
+                  <div class="step-circle"><i class="bi bi-tools"></i></div>
+                  <div class="small fw-semibold">Restoring</div>
+                </div>
+                <div class="step-node" id="step5">
+                  <div class="step-circle"><i class="bi bi-lightning-charge"></i></div>
+                  <div class="small fw-semibold">Restored</div>
+                </div>
+              </div>
+
+              <hr class="my-3">
+
+              <h6 class="fw-bold mb-3"><i class="bi bi-clock-history text-muted me-2"></i>Field Activity Log</h6>
+              <div class="timeline-log" id="timelineLogContainer">
+                <!-- Dynamically populated via JavaScript -->
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 4: CUSTOMER NOTIFICATION HUB -->
+      <!-- ===================================================================== -->
+      <div class="tab-pane fade" id="notifications-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="fw-bold mb-0">Customer Communication & Notification Audit</h5>
+            <small class="text-muted">Multi-channel transmission history (SMS, Email, In-App) & Control Room Broadcast</small>
+          </div>
+          <button class="btn btn-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#broadcastModal">
+            <i class="bi bi-megaphone-fill text-warning me-1"></i> Send Area Broadcast
+          </button>
+        </div>
+
+        <div class="row g-3" id="notificationFeedContainer">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS -->
+  <!-- ========================================================================= -->
+
+  <!-- Modal 1: Report Outage -->
+  <div class="modal fade" id="reportOutageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-lightning-slash me-2"></i>Report Electrical Outage</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleReportOutage(event)">
+          <div class="modal-body p-4">
+            
+            <div id="duplicateAlertBox" class="alert alert-warning d-none mb-3">
+              <i class="bi bi-exclamation-triangle-fill me-1"></i>
+              <strong>Existing Outage Detected:</strong> An incident is already open on this feeder. Your report will be automatically grouped into ticket <span id="duplicateTicketId" class="fw-bold font-mono"></span>.
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Distribution Area *</label>
+              <select id="modalAreaSelect" class="form-select" onchange="onModalAreaChange(this.value)" required>
+                <option value="">Select Area...</option>
+                <option value="Green Valley Suburbs">Green Valley Suburbs</option>
+                <option value="East Bay Waterfront">East Bay Waterfront</option>
+                <option value="North Industrial Corridor">North Industrial Corridor</option>
+                <option value="Downtown Financial District">Downtown Financial District</option>
+                <option value="West Hills Commercial Hub">West Hills Commercial Hub</option>
+                <option value="South Tech Park">South Tech Park</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Feeder / Substation Circuit *</label>
+              <select id="modalFeederSelect" class="form-select" onchange="checkDuplicateOutage()" required>
+                <option value="">Select Feeder...</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Incident Title *</label>
+              <input type="text" id="modalTitleInput" class="form-control" placeholder="e.g. Sparking wire down across residential street" required>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold small">Severity Level *</label>
+                <select id="modalSeveritySelect" class="form-select">
+                  <option value="CRITICAL">CRITICAL (Fire/Hospital/33kV)</option>
+                  <option value="HIGH" selected>HIGH (Substation/Main Feeder)</option>
+                  <option value="MEDIUM">MEDIUM (Residential Lateral)</option>
+                  <option value="LOW">LOW (Single Transformer / Drop)</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold small">Reporter Contact Phone</label>
+                <input type="tel" id="modalPhoneInput" class="form-control" placeholder="+1-555-0199" value="+1-555-1001">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Incident Description & Location Details *</label>
+              <textarea id="modalDescInput" class="form-control" rows="3" placeholder="Describe the damage, street landmark, fallen pole, smoke, or buzzing sounds..." required></textarea>
+            </div>
+
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger fw-semibold">Submit Outage Report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Dispatch Crew Work Order -->
+  <div class="modal fade" id="dispatchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-truck me-2"></i>Dispatch Crew & Create Work Order</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleDispatchCrew(event)">
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Target Outage Incident *</label>
+              <select id="dispatchOutageSelect" class="form-select" required>
+                <!-- Populated via JS with active outages -->
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Assign Restoration Crew (Collision Prevention) *</label>
+              <select id="dispatchCrewSelect" class="form-select" required>
+                <!-- Only AVAILABLE crews are selectable -->
+              </select>
+              <small class="text-muted" style="font-size: 0.72rem;">* Busy crews (Dispatched / On Duty / Maintenance) are automatically disabled to prevent collision.</small>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold small">Work Order Priority</label>
+                <select id="dispatchPrioritySelect" class="form-select">
+                  <option value="EMERGENCY">EMERGENCY</option>
+                  <option value="HIGH" selected>HIGH</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="LOW">LOW</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold small">Estimated Duration (Mins)</label>
+                <input type="number" id="dispatchDurationInput" class="form-control" value="120" step="15">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Work Instructions & Safety Protocol</label>
+              <textarea id="dispatchInstructions" class="form-control" rows="3" placeholder="Provide grounding protocol, switching isolation orders, and site access details..."></textarea>
+            </div>
+
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary fw-semibold">Dispatch Crew</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Area Broadcast -->
+  <div class="modal fade" id="broadcastModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-megaphone-fill text-warning me-2"></i>Send Area Broadcast Alert</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleSendBroadcast(event)">
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Target Distribution Area *</label>
+              <select id="broadcastAreaSelect" class="form-select" required>
+                <option value="Green Valley Suburbs">Green Valley Suburbs (22,500 meters)</option>
+                <option value="East Bay Waterfront">East Bay Waterfront (18,400 meters)</option>
+                <option value="North Industrial Corridor">North Industrial Corridor (6,800 meters)</option>
+                <option value="Downtown Financial District">Downtown Financial (14,200 meters)</option>
+                <option value="West Hills Commercial Hub">West Hills (11,300 meters)</option>
+                <option value="South Tech Park">South Tech Park (9,200 meters)</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Broadcast Notice Title *</label>
+              <input type="text" id="broadcastTitle" class="form-control" placeholder="e.g. Severe Storm Weather Advisory & Crew Mobilization" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Broadcast Message Body *</label>
+              <textarea id="broadcastMessage" class="form-control" rows="3" placeholder="Enter notification text to be sent via SMS/Email to all registered customers in the zone..." required></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Delivery Channels</label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" checked id="chSms">
+                  <label class="form-check-label small" for="chSms">SMS Gateway</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" checked id="chEmail">
+                  <label class="form-check-label small" for="chEmail">Email Notice</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" checked id="chApp">
+                  <label class="form-check-label small" for="chApp">Customer Portal In-App</label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-dark fw-semibold">Transmit Broadcast</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container-omrs" id="toastContainer"></div>
+
+  <!-- Bootstrap 5.3 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ========================================================================= -->
+  <!-- APPLICATION STATE & LOGIC -->
+  <!-- ========================================================================= -->
+  <script>
+    // In-memory initial realistic state (Matching database seed data)
+    let currentRole = 'ROLE_ADMIN';
+
+    const areasAndFeeders = {
+      'Green Valley Suburbs': ['FDR-GVS-3301 (Res North 11kV)', 'FDR-GVS-3302 (Res South 11kV)'],
+      'East Bay Waterfront': ['FDR-EBW-5501 (Harbor Terminal 33kV)', 'FDR-EBW-5502 (Marina Shoreline 11kV)'],
+      'North Industrial Corridor': ['FDR-NIC-2201 (Steel Mill Feeder 66kV)', 'FDR-NIC-2202 (Chemical Feeder 33kV)'],
+      'Downtown Financial District': ['FDR-DM-1101 (Primary Ring 33kV)', 'FDR-DM-1102 (Commercial Express 11kV)'],
+      'West Hills Commercial Hub': ['FDR-WHC-4401 (Retail Plaza 33kV)', 'FDR-WHC-4402 (Metro Hospital Dedicated 11kV)'],
+      'South Tech Park': ['FDR-STP-6601 (Data Center 66kV)', 'FDR-STP-6602 (Biotech Campus 11kV)']
+    };
+
+    let outages = [
+      {
+        id: 1,
+        outageNumber: 'OUT-2026-0001',
+        title: 'Fallen Pine Tree Across 11kV Feeder Line',
+        description: 'Severe wind gust knocked mature pine tree across primary lines near 450 Elm St.',
+        area: 'Green Valley Suburbs',
+        feeder: 'FDR-GVS-3301 (Res North 11kV)',
+        severity: 'HIGH',
+        status: 'IN_PROGRESS',
+        affectedCustomers: 1450,
+        reportCount: 4,
+        reportedAt: '2026-03-10 14:15',
+        etr: '2026-03-10 18:30',
+        rootCause: 'Severe windstorm caused tree branch contact',
+        assignedCrew: 'Bravo Line Restoration Crew'
+      },
+      {
+        id: 2,
+        outageNumber: 'OUT-2026-0002',
+        title: 'Underground 33kV Cable Joint Insulation Breakdown',
+        description: 'Water ingress in marina vault causing phase-to-ground fault. Feeder tripped on overcurrent.',
+        area: 'East Bay Waterfront',
+        feeder: 'FDR-EBW-5502 (Marina Shoreline 11kV)',
+        severity: 'CRITICAL',
+        status: 'IN_PROGRESS',
+        affectedCustomers: 3200,
+        reportCount: 6,
+        reportedAt: '2026-03-10 13:40',
+        etr: '2026-03-10 19:00',
+        rootCause: 'Underground cable joint moisture penetration',
+        assignedCrew: 'Delta Underground Cable Team'
+      },
+      {
+        id: 3,
+        outageNumber: 'OUT-2026-0003',
+        title: 'Substation Vacuum Circuit Breaker Lockout',
+        description: 'Feeder FDR-NIC-2202 locked out following transient arc flash at secondary bus terminal.',
+        area: 'North Industrial Corridor',
+        feeder: 'FDR-NIC-2202 (Chemical Feeder 33kV)',
+        severity: 'HIGH',
+        status: 'VERIFIED',
+        affectedCustomers: 850,
+        reportCount: 2,
+        reportedAt: '2026-03-10 15:00',
+        etr: '2026-03-10 19:30',
+        rootCause: 'Busbar insulator degradation',
+        assignedCrew: 'Charlie Substation Specialist Unit'
+      },
+      {
+        id: 4,
+        outageNumber: 'OUT-2026-0004',
+        title: 'Pad-Mounted Transformer Smoking on Market Street',
+        description: 'Audible buzzing and electrical smoke reported from unit T-44.',
+        area: 'Downtown Financial District',
+        feeder: 'FDR-DM-1102 (Commercial Express 11kV)',
+        severity: 'CRITICAL',
+        status: 'REPORTED',
+        affectedCustomers: 420,
+        reportCount: 3,
+        reportedAt: '2026-03-10 15:35',
+        etr: '2026-03-10 20:00',
+        rootCause: 'Pending inspection',
+        assignedCrew: null
+      },
+      {
+        id: 5,
+        outageNumber: 'OUT-2026-0005',
+        title: 'Excavator Severed Underground Conduit near Retail Plaza',
+        description: 'Construction crew severed secondary distribution conduit.',
+        area: 'West Hills Commercial Hub',
+        feeder: 'FDR-WHC-4401 (Retail Plaza 33kV)',
+        severity: 'HIGH',
+        status: 'REPORTED',
+        affectedCustomers: 310,
+        reportCount: 2,
+        reportedAt: '2026-03-10 15:45',
+        etr: '2026-03-10 20:30',
+        rootCause: 'Third-party construction excavation damage',
+        assignedCrew: null
+      },
+      {
+        id: 6,
+        outageNumber: 'OUT-2026-0006',
+        title: 'Blown Pole Fuse Cutout on Willow Court',
+        description: 'Loud bang heard and streetlights went dark.',
+        area: 'Green Valley Suburbs',
+        feeder: 'FDR-GVS-3301 (Res North 11kV)',
+        severity: 'MEDIUM',
+        status: 'REPORTED',
+        affectedCustomers: 85,
+        reportCount: 2,
+        reportedAt: '2026-03-10 15:50',
+        etr: '2026-03-10 18:00',
+        rootCause: 'Overloaded lateral cutout switch fuse',
+        assignedCrew: null
+      },
+      {
+        id: 16,
+        outageNumber: 'OUT-2026-0016',
+        title: 'Substation Breaker 3A Spurious Trip Restored',
+        description: 'Substation breaker reset, optical relay replaced, re-energized.',
+        area: 'Downtown Financial District',
+        feeder: 'FDR-DM-1101 (Primary Ring 33kV)',
+        severity: 'HIGH',
+        status: 'RESTORED',
+        affectedCustomers: 1250,
+        reportCount: 4,
+        reportedAt: '2026-03-09 08:30',
+        etr: 'Restored',
+        rootCause: 'Faulty optical sensor in CT wiring',
+        assignedCrew: 'Alpha Rapid Response Crew'
+      }
+    ];
+
+    let crews = [
+      { id: 1, code: 'CRW-ALPHA', name: 'Alpha Rapid Response Crew', lead: 'Jake Miller', vehicle: 'FLT-TRK-101 (Bucket Truck)', status: 'AVAILABLE', baseArea: 'Downtown Financial', members: 4, spec: 'High Voltage Overhead' },
+      { id: 2, code: 'CRW-BRAVO', name: 'Bravo Line Restoration Crew', lead: 'Frank Thomas', vehicle: 'FLT-TRK-102 (Line Truck)', status: 'DISPATCHED', baseArea: 'Green Valley', members: 3, spec: 'Line & Pole Replacement' },
+      { id: 3, code: 'CRW-CHARLIE', name: 'Charlie Substation Specialist', lead: 'Lucas Scott', vehicle: 'FLT-VAN-201 (Test Lab)', status: 'ON_DUTY', baseArea: 'North Industrial', members: 3, spec: 'Transformers & Switchgear' },
+      { id: 4, code: 'CRW-DELTA', name: 'Delta Underground Team', lead: 'Nathan Drake', vehicle: 'FLT-VAN-202 (Thumper Van)', status: 'DISPATCHED', baseArea: 'East Bay Waterfront', members: 4, spec: 'Underground Cable Splicing' },
+      { id: 5, code: 'CRW-ECHO', name: 'Echo Heavy Emergency Squad', lead: 'Marcus Vance', vehicle: 'FLT-CRN-301 (Mobile Crane)', status: 'AVAILABLE', baseArea: 'West Hills', members: 5, spec: 'Heavy Structural Damage' },
+      { id: 6, code: 'CRW-FOXTROT', name: 'Foxtrot Tree & Storm Crew', lead: 'Elena Rodriguez', vehicle: 'FLT-TRK-103 (Forestry Chipper)', status: 'AVAILABLE', baseArea: 'Green Valley', members: 4, spec: 'Vegetation & Wire Clearing' },
+      { id: 7, code: 'CRW-GOLF', name: 'Golf Secondary Grid Crew', lead: 'David Kim', vehicle: 'FLT-VAN-203 (Service Van)', status: 'AVAILABLE', baseArea: 'South Tech Park', members: 3, spec: 'Low Voltage & Meters' },
+      { id: 8, code: 'CRW-HOTEL', name: 'Hotel High Voltage Patrol', lead: 'Marcus Vance', vehicle: 'FLT-TRK-104 (4x4 Patrol)', status: 'MAINTENANCE', baseArea: 'Downtown Financial', members: 2, spec: 'Thermal Camera Patrol' }
+    ];
+
+    let workOrders = [
+      { id: 1, woNumber: 'WO-2026-0001', outageNumber: 'OUT-2026-0001', crew: 'Bravo Line Restoration Crew', vehicle: 'FLT-TRK-102', priority: 'HIGH', status: 'WORKING', assignedAt: '14:40', duration: '210 min' },
+      { id: 2, woNumber: 'WO-2026-0002', outageNumber: 'OUT-2026-0002', crew: 'Delta Underground Team', vehicle: 'FLT-VAN-202', priority: 'EMERGENCY', status: 'WORKING', assignedAt: '14:05', duration: '300 min' },
+      { id: 3, woNumber: 'WO-2026-0003', outageNumber: 'OUT-2026-0003', crew: 'Charlie Substation Specialist', vehicle: 'FLT-VAN-201', priority: 'HIGH', status: 'EN_ROUTE', assignedAt: '15:25', duration: '180 min' }
+    ];
+
+    let timelineEvents = {
+      'OUT-2026-0001': [
+        { time: '14:15', percent: 0, status: 'INCIDENT_REPORTED', remarks: 'First customer report logged via Customer Portal from 452 Elm St.' },
+        { time: '14:35', percent: 10, status: 'CONTROL_ROOM_VERIFIED', remarks: 'Control Room verified 11kV Feeder trip on supervisory SCADA alarm.' },
+        { time: '14:40', percent: 20, status: 'CREW_DISPATCHED', remarks: 'Work Order WO-2026-0001 issued. Crew Bravo dispatched.' },
+        { time: '15:15', percent: 40, status: 'SITE_ASSESSMENT', remarks: 'Arrived on scene. Fallen mature pine tree resting directly across 3 phases.' },
+        { time: '15:55', percent: 70, status: 'VEGETATION_CLEARED', remarks: 'Chainsaw trimming completed. Conductor strands spliced with compression sleeve.' }
+      ]
+    };
+
+    let notifications = [
+      { id: 1, type: 'OUTAGE_REPORTED', title: 'Grid Alert: Outage in Green Valley Suburbs', message: 'We have detected an outage affecting your service address. Reference: OUT-2026-0001.', channel: 'SMS', time: '14:16', read: false },
+      { id: 2, type: 'CREW_ASSIGNED', title: 'Restoration Crew Dispatched', message: 'Bravo Line Crew dispatched to work order WO-2026-0001. ETA 25 minutes.', channel: 'IN_APP', time: '14:41', read: true },
+      { id: 3, type: 'ETR_UPDATED', title: 'Restoration Time Updated', message: 'Work is 70% completed. Estimated power restoration time is now 18:30.', channel: 'SMS', time: '16:32', read: false },
+      { id: 4, type: 'AREA_BROADCAST', title: 'High Wind Warning & Grid Alert', message: 'High wind gusts detected across Green Valley. 8 restoration crews mobilized.', channel: 'EMAIL', time: '12:00', read: true }
+    ];
+
+    // =========================================================================
+    // INITIALIZATION & RENDER
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderOutages();
+      renderCrews();
+      renderWorkOrders();
+      populateProgressSelect();
+      renderTimeline('OUT-2026-0001');
+      renderNotifications();
+      populateModalFeeders();
+      populateDispatchOutages();
+    });
+
+    // Role switcher logic
+    function onRoleChange(role) {
+      currentRole = role;
+      const avatar = document.getElementById('userAvatar');
+      const name = document.getElementById('userNameLabel');
+      const roleLabel = document.getElementById('userRoleLabel');
+
+      if (role === 'ROLE_ADMIN') {
+        avatar.innerText = 'AM';
+        name.innerText = 'Alex Morgan';
+        roleLabel.innerText = 'Chief Grid Controller (Admin)';
+        showToast('Switched to Control Room Operator mode (Full CRUD permissions).', 'info');
+      } else if (role === 'ROLE_FIELD_ENGINEER') {
+        avatar.innerText = 'MV';
+        name.innerText = 'Marcus Vance';
+        roleLabel.innerText = 'Lead Field Restoration Engineer';
+        switchTab('progress-tab');
+        showToast('Switched to Field Engineer mode. Opened Progress Tracker.', 'info');
+      } else if (role === 'ROLE_CUSTOMER') {
+        avatar.innerText = 'JD';
+        name.innerText = 'John Doe';
+        roleLabel.innerText = 'Customer (ACC-88201)';
+        switchTab('outages-tab');
+        showToast('Switched to Customer Portal mode. Showing localized view.', 'info');
+      }
+    }
+
+    function switchTab(tabId) {
+      const triggerEl = document.getElementById(tabId);
+      if (triggerEl) {
+        const tab = new bootstrap.Tab(triggerEl);
+        tab.show();
+      }
+    }
+
+    // =========================================================================
+    // OUTAGES TAB
+    // =========================================================================
+    function renderOutages() {
+      const tbody = document.getElementById('outageTableBody');
+      const search = document.getElementById('outageSearchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const areaFilter = document.getElementById('filterArea').value;
+      const sevFilter = document.getElementById('filterSeverity').value;
+
+      let filtered = outages.filter(o => {
+        const matchSearch = o.outageNumber.toLowerCase().includes(search) ||
+                            o.title.toLowerCase().includes(search) ||
+                            o.area.toLowerCase().includes(search) ||
+                            o.feeder.toLowerCase().includes(search);
+        const matchStatus = statusFilter === 'ALL' || o.status === statusFilter;
+        const matchArea = areaFilter === 'ALL' || o.area === areaFilter;
+        const matchSev = sevFilter === 'ALL' || o.severity === sevFilter;
+        return matchSearch && matchStatus && matchArea && matchSev;
+      });
+
+      tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">No outage incidents match the selected filter criteria.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="ps-3"><strong class="font-mono text-primary">${o.outageNumber}</strong></td>
+          <td>
+            <div class="fw-semibold">${o.title}</div>
+            <small class="text-muted text-truncate d-inline-block" style="max-width: 280px;">${o.description}</small>
+          </td>
+          <td>
+            <div class="fw-semibold small">${o.area}</div>
+            <small class="text-muted font-mono" style="font-size: 0.72rem;">${o.feeder}</small>
+          </td>
+          <td><span class="badge badge-sev-${o.severity}">${o.severity}</span></td>
+          <td><span class="badge-status badge-${o.status}">${o.status}</span></td>
+          <td><span class="fw-semibold">${o.affectedCustomers.toLocaleString()}</span> <small class="text-muted">cust</small></td>
+          <td><span class="badge bg-secondary-subtle text-secondary font-mono">${o.reportCount}</span></td>
+          <td><small class="text-muted">${o.reportedAt}</small></td>
+          <td><strong class="small text-danger">${o.etr}</strong></td>
+          <td class="text-end pe-3">
+            <button class="btn btn-sm btn-outline-primary" onclick="openIncidentDetails('${o.outageNumber}')" title="View Timeline & Details">
+              <i class="bi bi-eye-fill"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateMetrics();
+    }
+
+    function filterOutages() {
+      renderOutages();
+    }
+
+    function openIncidentDetails(outageNumber) {
+      switchTab('progress-tab');
+      document.getElementById('progressOutageSelect').value = outageNumber;
+      onSelectProgressOutage(outageNumber);
+      showToast(`Loaded timeline for ${outageNumber}`, 'info');
+    }
+
+    // Modal Feeder Population
+    function onModalAreaChange(area) {
+      const feederSelect = document.getElementById('modalFeederSelect');
+      feederSelect.innerHTML = '<option value="">Select Feeder...</option>';
+      if (areasAndFeeders[area]) {
+        areasAndFeeders[area].forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f;
+          opt.innerText = f;
+          feederSelect.appendChild(opt);
+        });
+      }
+      checkDuplicateOutage();
+    }
+
+    // Duplicate grouping detection in modal!
+    function checkDuplicateOutage() {
+      const area = document.getElementById('modalAreaSelect').value;
+      const feeder = document.getElementById('modalFeederSelect').value;
+      const alertBox = document.getElementById('duplicateAlertBox');
+      const ticketIdSpan = document.getElementById('duplicateTicketId');
+
+      const existing = outages.find(o => o.area === area && o.feeder === feeder && o.status !== 'RESTORED' && o.status !== 'CANCELLED');
+      if (existing) {
+        alertBox.classList.remove('d-none');
+        ticketIdSpan.innerText = existing.outageNumber;
+      } else {
+        alertBox.classList.add('d-none');
+      }
+    }
+
+    // Handle Report Outage Submission
+    function handleReportOutage(event) {
+      event.preventDefault();
+      const area = document.getElementById('modalAreaSelect').value;
+      const feeder = document.getElementById('modalFeederSelect').value;
+      const title = document.getElementById('modalTitleInput').value;
+      const severity = document.getElementById('modalSeveritySelect').value;
+      const desc = document.getElementById('modalDescInput').value;
+
+      // Duplicate check:
+      const existing = outages.find(o => o.area === area && o.feeder === feeder && o.status !== 'RESTORED' && o.status !== 'CANCELLED');
+
+      if (existing) {
+        // Group into existing ticket!
+        existing.reportCount++;
+        existing.affectedCustomers += 1;
+        showToast(`Duplicate report grouped into active ticket ${existing.outageNumber}!`, 'warning');
+      } else {
+        // Create new ticket!
+        const newId = outages.length + 1;
+        const newTicketNum = `OUT-2026-000${newId}`;
+        const newOutage = {
+          id: newId,
+          outageNumber: newTicketNum,
+          title: title,
+          description: desc,
+          area: area,
+          feeder: feeder,
+          severity: severity,
+          status: 'REPORTED',
+          affectedCustomers: 120,
+          reportCount: 1,
+          reportedAt: 'Just Now',
+          etr: 'Assessing',
+          rootCause: 'Under Investigation',
+          assignedCrew: null
+        };
+        outages.unshift(newOutage);
+
+        // Add to timeline
+        timelineEvents[newTicketNum] = [
+          { time: 'Just Now', percent: 0, status: 'INCIDENT_REPORTED', remarks: `Logged by customer. ${desc}` }
+        ];
+
+        // Add simulated notification
+        notifications.unshift({
+          id: notifications.length + 1,
+          type: 'OUTAGE_REPORTED',
+          title: `Grid Alert: Outage Reported in ${area}`,
+          message: `Incident ${newTicketNum} has been logged. Control Room operators are investigating.`,
+          channel: 'SMS,EMAIL,IN_APP',
+          time: 'Just Now',
+          read: false
+        });
+
+        showToast(`New Outage Incident ${newTicketNum} created & dispatched to queue!`, 'success');
+      }
+
+      // Close modal
+      const modalEl = document.getElementById('reportOutageModal');
+      bootstrap.Modal.getInstance(modalEl).hide();
+      document.querySelector('#reportOutageModal form').reset();
+      document.getElementById('duplicateAlertBox').classList.add('d-none');
+
+      renderOutages();
+      populateProgressSelect();
+      populateDispatchOutages();
+      renderNotifications();
+    }
+
+    // =========================================================================
+    // CREW DISPATCH TAB
+    // =========================================================================
+    function renderCrews() {
+      const grid = document.getElementById('crewsCardGrid');
+      grid.innerHTML = '';
+
+      crews.forEach(c => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-xl-3';
+        const isAvail = c.status === 'AVAILABLE';
+
+        col.innerHTML = `
+          <div class="card h-100 bg-white border rounded-3 p-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-dark font-mono">${c.code}</span>
+              <span class="badge badge-crew-${c.status}">${c.status}</span>
+            </div>
+            <h6 class="fw-bold mb-1">${c.name}</h6>
+            <div class="text-muted small mb-2"><i class="bi bi-person-fill text-primary me-1"></i>Lead: ${c.lead}</div>
+            
+            <div class="bg-light rounded p-2 small mb-3">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Vehicle:</span>
+                <span class="fw-semibold">${c.vehicle.split(' ')[0]}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Base:</span>
+                <span class="fw-semibold">${c.baseArea}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Specialty:</span>
+                <span class="fw-semibold">${c.spec}</span>
+              </div>
+            </div>
+
+            <button class="btn btn-sm ${isAvail ? 'btn-outline-primary' : 'btn-light text-muted'} w-100 fw-semibold mt-auto" 
+                    ${isAvail ? `onclick="openDispatchForCrew(${c.id})"` : 'disabled'}>
+              ${isAvail ? '<i class="bi bi-send me-1"></i> Dispatch to Incident' : '<i class="bi bi-lock me-1"></i> Crew Engaged'}
+            </button>
+          </div>
+        `;
+        grid.appendChild(col);
+      });
+
+      renderCrewDispatchSelect();
+    }
+
+    function renderWorkOrders() {
+      const tbody = document.getElementById('workOrderTableBody');
+      tbody.innerHTML = '';
+
+      workOrders.forEach(w => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="ps-3"><strong class="font-mono text-primary">${w.woNumber}</strong></td>
+          <td><strong class="font-mono">${w.outageNumber}</strong></td>
+          <td class="fw-semibold">${w.crew}</td>
+          <td><small class="text-muted font-mono">${w.vehicle}</small></td>
+          <td><span class="badge ${w.priority === 'EMERGENCY' ? 'bg-danger' : 'bg-warning text-dark'}">${w.priority}</span></td>
+          <td><span class="badge bg-primary-subtle text-primary">${w.status}</span></td>
+          <td><small class="text-muted">${w.assignedAt}</small></td>
+          <td><small class="text-muted">${w.duration}</small></td>
+          <td class="text-end pe-3">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" onclick="advanceWoStatus(${w.id}, 'EN_ROUTE')" ${w.status !== 'ASSIGNED' ? 'disabled' : ''} title="Mark En Route">
+                <i class="bi bi-car-front"></i> En Route
+              </button>
+              <button class="btn btn-outline-primary" onclick="advanceWoStatus(${w.id}, 'WORKING')" ${w.status !== 'EN_ROUTE' ? 'disabled' : ''} title="Mark Working">
+                <i class="bi bi-tools"></i> Working
+              </button>
+              <button class="btn btn-outline-success" onclick="advanceWoStatus(${w.id}, 'COMPLETED')" ${w.status !== 'WORKING' ? 'disabled' : ''} title="Mark Completed & Restore">
+                <i class="bi bi-check2-circle"></i> Complete
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('woCountBadge').innerText = `${workOrders.filter(w => w.status !== 'COMPLETED').length} Active`;
+    }
+
+    function openDispatchForCrew(crewId) {
+      document.getElementById('dispatchCrewSelect').value = crewId;
+      const modal = new bootstrap.Modal(document.getElementById('dispatchModal'));
+      modal.show();
+    }
+
+    function populateDispatchOutages() {
+      const select = document.getElementById('dispatchOutageSelect');
+      select.innerHTML = '';
+      const unassigned = outages.filter(o => o.status !== 'RESTORED' && o.status !== 'CANCELLED' && !o.assignedCrew);
+      
+      if (unassigned.length === 0) {
+        select.innerHTML = '<option value="">All active incidents currently have assigned crews!</option>';
+      } else {
+        unassigned.forEach(o => {
+          const opt = document.createElement('option');
+          opt.value = o.outageNumber;
+          opt.innerText = `${o.outageNumber} - ${o.title} (${o.area})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    function renderCrewDispatchSelect() {
+      const select = document.getElementById('dispatchCrewSelect');
+      select.innerHTML = '';
+
+      crews.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.disabled = c.status !== 'AVAILABLE';
+        opt.innerText = `${c.name} [${c.status}] - ${c.spec}`;
+        select.appendChild(opt);
+      });
+    }
+
+    function handleDispatchCrew(event) {
+      event.preventDefault();
+      const outageNum = document.getElementById('dispatchOutageSelect').value;
+      const crewId = parseInt(document.getElementById('dispatchCrewSelect').value);
+      const priority = document.getElementById('dispatchPrioritySelect').value;
+      const duration = document.getElementById('dispatchDurationInput').value;
+
+      const crew = crews.find(c => c.id === crewId);
+      const outage = outages.find(o => o.outageNumber === outageNum);
+
+      if (!crew || crew.status !== 'AVAILABLE') {
+        showToast('Selected crew is not available for dispatch!', 'danger');
+        return;
+      }
+
+      // Assign crew
+      crew.status = 'DISPATCHED';
+      if (outage) {
+        outage.assignedCrew = crew.name;
+        outage.status = 'IN_PROGRESS';
+      }
+
+      // Create Work Order
+      const newWo = {
+        id: workOrders.length + 1,
+        woNumber: `WO-2026-000${workOrders.length + 1}`,
+        outageNumber: outageNum,
+        crew: crew.name,
+        vehicle: crew.vehicle.split(' ')[0],
+        priority: priority,
+        status: 'ASSIGNED',
+        assignedAt: 'Just Now',
+        duration: `${duration} min`
+      };
+      workOrders.unshift(newWo);
+
+      // Add to timeline
+      if (timelineEvents[outageNum]) {
+        timelineEvents[outageNum].push({
+          time: 'Just Now',
+          percent: 25,
+          status: 'CREW_ASSIGNED',
+          remarks: `Work Order ${newWo.woNumber} created. ${crew.name} dispatched with priority ${priority}.`
+        });
+      }
+
+      // Add notification
+      notifications.unshift({
+        id: notifications.length + 1,
+        type: 'CREW_ASSIGNED',
+        title: `Restoration Crew Dispatched to ${outageNum}`,
+        message: `${crew.name} assigned to work order ${newWo.woNumber}. En route to repair site.`,
+        channel: 'SMS,IN_APP',
+        time: 'Just Now',
+        read: false
+      });
+
+      bootstrap.Modal.getInstance(document.getElementById('dispatchModal')).hide();
+      showToast(`Crew ${crew.name} successfully dispatched to ${outageNum}!`, 'success');
+
+      renderCrews();
+      renderWorkOrders();
+      renderOutages();
+      populateDispatchOutages();
+      renderNotifications();
+    }
+
+    function advanceWoStatus(woId, newStatus) {
+      const wo = workOrders.find(w => w.id === woId);
+      if (!wo) return;
+
+      wo.status = newStatus;
+      const crew = crews.find(c => c.name === wo.crew);
+      const outage = outages.find(o => o.outageNumber === wo.outageNumber);
+
+      if (newStatus === 'EN_ROUTE') {
+        if (crew) crew.status = 'DISPATCHED';
+        showToast(`${wo.woNumber}: Crew marked En Route to site.`, 'info');
+      } else if (newStatus === 'WORKING') {
+        if (crew) crew.status = 'ON_DUTY';
+        showToast(`${wo.woNumber}: Crew arrived on scene & working.`, 'info');
+      } else if (newStatus === 'COMPLETED') {
+        if (crew) crew.status = 'AVAILABLE';
+        if (outage) {
+          outage.status = 'RESTORED';
+          outage.etr = 'Restored';
+        }
+        showToast(`Work Order ${wo.woNumber} COMPLETED! Outage ${wo.outageNumber} auto-closed to RESTORED.`, 'success');
+        
+        // Add completion notification
+        notifications.unshift({
+          id: notifications.length + 1,
+          type: 'POWER_RESTORED',
+          title: `Power Restored in ${outage ? outage.area : 'Affected Area'}!`,
+          message: `Repairs complete on ${wo.outageNumber}. Electric service fully restored.`,
+          channel: 'SMS,EMAIL,IN_APP',
+          time: 'Just Now',
+          read: false
+        });
+      }
+
+      renderWorkOrders();
+      renderCrews();
+      renderOutages();
+      renderNotifications();
+    }
+
+    // =========================================================================
+    // RESTORATION PROGRESS TAB
+    // =========================================================================
+    function populateProgressSelect() {
+      const select = document.getElementById('progressOutageSelect');
+      select.innerHTML = '';
+
+      outages.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o.outageNumber;
+        opt.innerText = `${o.outageNumber} - ${o.title} [${o.status}]`;
+        select.appendChild(opt);
+      });
+    }
+
+    function onSelectProgressOutage(outageNumber) {
+      renderTimeline(outageNumber);
+    }
+
+    function renderTimeline(outageNumber) {
+      const outage = outages.find(o => o.outageNumber === outageNumber);
+      if (!outage) return;
+
+      document.getElementById('timelineTitle').innerText = `${outage.outageNumber} Timeline`;
+      document.getElementById('timelineSubtitle').innerText = `${outage.title} (${outage.area})`;
+      
+      const statusBadge = document.getElementById('timelineStatusBadge');
+      statusBadge.innerText = outage.status;
+      statusBadge.className = `badge-status badge-${outage.status}`;
+
+      // Update Visual Stepper
+      const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+      steps.forEach(s => document.getElementById(s).className = 'step-node');
+
+      if (outage.status === 'REPORTED') {
+        document.getElementById('step1').className = 'step-node active';
+      } else if (outage.status === 'VERIFIED') {
+        document.getElementById('step1').className = 'step-node completed';
+        document.getElementById('step2').className = 'step-node active';
+      } else if (outage.status === 'IN_PROGRESS') {
+        document.getElementById('step1').className = 'step-node completed';
+        document.getElementById('step2').className = 'step-node completed';
+        document.getElementById('step3').className = 'step-node completed';
+        document.getElementById('step4').className = 'step-node active';
+      } else if (outage.status === 'RESTORED') {
+        steps.forEach(s => document.getElementById(s).className = 'step-node completed');
+      }
+
+      // Render Activity Log
+      const logContainer = document.getElementById('timelineLogContainer');
+      logContainer.innerHTML = '';
+
+      const events = timelineEvents[outageNumber] || [
+        { time: outage.reportedAt, percent: 0, status: 'INCIDENT_REPORTED', remarks: outage.description }
+      ];
+
+      events.forEach(e => {
+        const item = document.createElement('div');
+        item.className = 'timeline-log-item';
+        item.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center">
+            <strong class="text-primary small">${e.status.replace(/_/g, ' ')}</strong>
+            <span class="badge bg-light text-muted font-mono" style="font-size: 0.72rem;">${e.time}</span>
+          </div>
+          <div class="small text-dark mt-1">${e.remarks}</div>
+          <div class="mt-1">
+            <span class="badge ${e.percent >= 100 ? 'bg-success' : 'bg-primary'} font-mono" style="font-size: 0.7rem;">${e.percent}% complete</span>
+          </div>
+        `;
+        logContainer.appendChild(item);
+      });
+    }
+
+    function submitProgressUpdate(event) {
+      event.preventDefault();
+      const outageNumber = document.getElementById('progressOutageSelect').value;
+      const percent = parseInt(document.getElementById('progressSlider').value);
+      const statusReached = document.getElementById('progressStatusReached').value;
+      const remarks = document.getElementById('progressRemarks').value;
+      const etr = document.getElementById('progressEtr').value;
+
+      const outage = outages.find(o => o.outageNumber === outageNumber);
+      if (!outage) return;
+
+      if (!timelineEvents[outageNumber]) timelineEvents[outageNumber] = [];
+
+      timelineEvents[outageNumber].push({
+        time: 'Just Now',
+        percent: percent,
+        status: statusReached,
+        remarks: remarks
+      });
+
+      if (etr) {
+        outage.etr = etr.replace('T', ' ');
+      }
+
+      // If percentage reaches 100%, auto-close outage and free assigned crew!
+      if (percent >= 100) {
+        outage.status = 'RESTORED';
+        outage.etr = 'Restored';
+        if (outage.assignedCrew) {
+          const crew = crews.find(c => c.name === outage.assignedCrew);
+          if (crew) crew.status = 'AVAILABLE';
+        }
+        showToast(`Milestone 100% recorded! Outage ${outageNumber} marked RESTORED.`, 'success');
+        
+        notifications.unshift({
+          id: notifications.length + 1,
+          type: 'POWER_RESTORED',
+          title: `Power Restored: ${outageNumber}`,
+          message: `Repairs confirmed at 100%. Grid fully re-energized.`,
+          channel: 'SMS,EMAIL,IN_APP',
+          time: 'Just Now',
+          read: false
+        });
+      } else {
+        outage.status = 'IN_PROGRESS';
+        showToast(`Milestone ${percent}% recorded for ${outageNumber}.`, 'info');
+      }
+
+      renderTimeline(outageNumber);
+      renderOutages();
+      renderCrews();
+      renderNotifications();
+      document.getElementById('progressRemarks').value = '';
+    }
+
+    // =========================================================================
+    // NOTIFICATIONS TAB
+    // =========================================================================
+    function renderNotifications() {
+      const container = document.getElementById('notificationFeedContainer');
+      container.innerHTML = '';
+
+      notifications.forEach(n => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6';
+        col.innerHTML = `
+          <div class="card bg-white border rounded-3 p-3 shadow-sm h-100 ${n.read ? '' : 'border-primary border-2'}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge ${n.type === 'POWER_RESTORED' ? 'bg-success' : (n.type === 'OUTAGE_REPORTED' ? 'bg-danger' : 'bg-primary')} small">
+                ${n.type.replace(/_/g, ' ')}
+              </span>
+              <div class="d-flex gap-2 align-items-center">
+                <span class="badge bg-light text-muted font-mono" style="font-size: 0.72rem;">${n.channel}</span>
+                <small class="text-muted">${n.time}</small>
+              </div>
+            </div>
+            <h6 class="fw-bold mb-1">${n.title}</h6>
+            <p class="text-muted small mb-0">${n.message}</p>
+          </div>
+        `;
+        container.appendChild(col);
+      });
+
+      document.getElementById('notifBadge').innerText = notifications.filter(n => !n.read).length;
+    }
+
+    function handleSendBroadcast(event) {
+      event.preventDefault();
+      const area = document.getElementById('broadcastAreaSelect').value;
+      const title = document.getElementById('broadcastTitle').value;
+      const msg = document.getElementById('broadcastMessage').value;
+
+      notifications.unshift({
+        id: notifications.length + 1,
+        type: 'AREA_BROADCAST',
+        title: title,
+        message: `[Broadcast to ${area}] ${msg}`,
+        channel: 'SMS,EMAIL,IN_APP',
+        time: 'Just Now',
+        read: false
+      });
+
+      bootstrap.Modal.getInstance(document.getElementById('broadcastModal')).hide();
+      document.querySelector('#broadcastModal form').reset();
+      showToast(`Area broadcast successfully queued for all meters in ${area}!`, 'success');
+      renderNotifications();
+    }
+
+    // =========================================================================
+    // HELPERS & METRIC COUNTERS
+    // =========================================================================
+    function updateMetrics() {
+      const active = outages.filter(o => o.status !== 'RESTORED' && o.status !== 'CANCELLED');
+      const restored = outages.filter(o => o.status === 'RESTORED');
+      const availCrews = crews.filter(c => c.status === 'AVAILABLE');
+
+      document.getElementById('metricActiveOutages').innerText = active.length;
+      document.getElementById('metricRestoredToday').innerText = restored.length;
+      document.getElementById('metricAvailableCrews').innerHTML = `${availCrews.length} <span class="fs-6 text-muted fw-normal">/ ${crews.length} ready</span>`;
+
+      const totalCust = active.reduce((sum, o) => sum + o.affectedCustomers, 0);
+      document.getElementById('metricAffectedCust').innerText = totalCust.toLocaleString();
+    }
+
+    function populateModalFeeders() {
+      onModalAreaChange('Green Valley Suburbs');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-white bg-${type === 'info' ? 'primary' : type} border-0 shadow show`;
+      toast.setAttribute('role', 'alert');
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body small fw-semibold">
+            <i class="bi bi-info-circle-fill me-2"></i> ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<div class="dashboard-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">Grid Operations Dashboard</h3>
+      <p class="text-muted small mb-0">Real-time status overview of electrical distribution networks and response units</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" (click)="loadMetrics()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+      </button>
+      <a routerLink="/outages" class="btn btn-danger btn-sm fw-semibold">
+        <i class="bi bi-lightning me-1"></i> Manage Incidents
+      </a>
+    </div>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-danger border-4">
+        <div class="text-muted small text-uppercase fw-semibold">Active Incidents</div>
+        <h2 class="fw-bold my-1 text-danger">{{ metrics.activeOutages }}</h2>
+        <small class="text-muted"><i class="bi bi-exclamation-circle text-danger me-1"></i>Requires Resolution</small>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-primary border-4">
+        <div class="text-muted small text-uppercase fw-semibold">Available Crews</div>
+        <h2 class="fw-bold my-1 text-primary">{{ metrics.crewsAvailable }} <span class="fs-6 text-muted fw-normal">/ {{ metrics.totalCrews }} total</span></h2>
+        <small class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i>Ready for Dispatch</small>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-success border-4">
+        <div class="text-muted small text-uppercase fw-semibold">Restored Today</div>
+        <h2 class="fw-bold my-1 text-success">{{ metrics.restoredToday }}</h2>
+        <small class="text-muted"><i class="bi bi-clock-history me-1"></i>Fully Re-energized</small>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-warning border-4">
+        <div class="text-muted small text-uppercase fw-semibold">Impacted Customers</div>
+        <h2 class="fw-bold my-1 text-warning">{{ metrics.totalAffectedCustomers | number }}</h2>
+        <small class="text-muted"><i class="bi bi-people me-1"></i>Meters Affected</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Quick Links -->
+  <div class="row g-3">
+    <div class="col-12 col-md-4">
+      <div class="card border-0 shadow-sm p-4 h-100 text-center">
+        <i class="bi bi-lightning-slash text-danger fs-1 mb-2"></i>
+        <h5 class="fw-bold">Outage Management</h5>
+        <p class="text-muted small">View, filter, and report outages across all substations and distribution areas.</p>
+        <a routerLink="/outages" class="btn btn-outline-danger mt-auto">Open Incidents</a>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="card border-0 shadow-sm p-4 h-100 text-center">
+        <i class="bi bi-truck text-primary fs-1 mb-2"></i>
+        <h5 class="fw-bold">Crew Dispatch</h5>
+        <p class="text-muted small">Manage fleet availability, create work orders, and assign technicians without collision.</p>
+        <a routerLink="/work-orders" class="btn btn-outline-primary mt-auto">Dispatch Work Orders</a>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="card border-0 shadow-sm p-4 h-100 text-center">
+        <i class="bi bi-speedometer2 text-success fs-1 mb-2"></i>
+        <h5 class="fw-bold">Restoration Tracker</h5>
+        <p class="text-muted small">Track field restoration milestones (0-100%) and timeline progress updates.</p>
+        <a routerLink="/progress" class="btn btn-outline-success mt-auto">Track Restoration</a>
+      </div>
+    </div>
+  </div>
+</div>

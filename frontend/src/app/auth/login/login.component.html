@@ -1,0 +1,53 @@
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="bg-dark p-4 text-center text-white border-bottom border-primary border-4">
+        <i class="bi bi-lightning-charge-fill text-warning fs-1"></i>
+        <h3 class="fw-bold mt-2 mb-0">GridFlow OMRS</h3>
+        <p class="text-secondary small mb-0">Energy &amp; Utilities Incident Control</p>
+      </div>
+
+      <div class="card-body p-4 p-md-5">
+        <h5 class="fw-bold mb-3 text-center">Sign in to your Portal</h5>
+
+        <div *ngIf="errorMessage" class="alert alert-danger py-2 small mb-3">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ errorMessage }}
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Username or Email</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+              <input type="text" formControlName="username" class="form-control" placeholder="Enter username" required>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+              <input type="password" formControlName="password" class="form-control" placeholder="Enter password" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" [disabled]="loading || loginForm.invalid">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ loading ? 'Signing in...' : 'Sign In' }}
+          </button>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+          <div class="small text-muted mb-2">Quick Credential Presets:</div>
+          <div class="btn-group btn-group-sm w-100">
+            <button class="btn btn-outline-secondary" (click)="fillQuickLogin('admin')">Admin</button>
+            <button class="btn btn-outline-secondary" (click)="fillQuickLogin('engineer')">Engineer</button>
+            <button class="btn btn-outline-secondary" (click)="fillQuickLogin('customer')">Customer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
