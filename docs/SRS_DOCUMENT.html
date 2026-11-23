@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Software Requirements Specification - Outage Management and Restoration System (OMRS)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.55;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  /* Cover Page */
+  .cover-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    padding: 25px 20px 40px 20px;
+    page-break-after: always;
+    border: 3px double #1e3a8a;
+  }
+
+  .college-emblem {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 15px auto;
+    border-radius: 50%;
+    border: 3px solid #1e3a8a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3a8a, #0f172a);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 26pt;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.25);
+  }
+
+  .college-title {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 20pt;
+    font-weight: 700;
+    color: #0f2942;
+    letter-spacing: 1px;
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+  }
+
+  .college-sub {
+    font-size: 10.5pt;
+    color: #475569;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+  }
+
+  .college-dept {
+    font-size: 12pt;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin: 0 0 25px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .doc-badge {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #1e3a8a;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    border: 1px solid #c7d2fe;
+  }
+
+  .doc-title {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 22pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 8px 0;
+    line-height: 1.25;
+  }
+
+  .doc-subtitle {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #2563eb;
+    margin: 0 0 10px 0;
+  }
+
+  .doc-standard {
+    font-size: 10pt;
+    font-style: italic;
+    color: #64748b;
+    margin: 0 0 25px 0;
+  }
+
+  .submission-meta {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 10pt;
+    text-align: left;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .submission-meta td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .submission-meta tr:last-child td {
+    border-bottom: none;
+  }
+
+  .submission-meta td.label {
+    font-weight: 600;
+    color: #334155;
+    width: 38%;
+    background: #f1f5f9;
+  }
+
+  .submission-meta td.val {
+    font-weight: 500;
+    color: #0f172a;
+  }
+
+  .cover-footer {
+    font-size: 9pt;
+    color: #64748b;
+    margin-top: 15px;
+  }
+
+  /* Structural Content */
+  .page-break {
+    page-break-before: always;
+  }
+
+  h1.section-header {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 15pt;
+    color: #0f2942;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 5px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  h2.sub-header {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  h3.sub-sub-header {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin: 0 0 12px 0;
+    padding-left: 22px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* Tables */
+  table.content-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin: 10px 0 16px 0;
+    page-break-inside: avoid;
+  }
+
+  table.content-table th {
+    background: #1e3a8a;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    padding: 7px 10px;
+    border: 1px solid #1e3a8a;
+  }
+
+  table.content-table td {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    vertical-align: top;
+  }
+
+  table.content-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  table.content-table code {
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8.5pt;
+    color: #0f172a;
+  }
+
+  .badge-pass {
+    display: inline-block;
+    background: #dcfce7;
+    color: #15803d;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 8pt;
+    border: 1px solid #86efac;
+  }
+
+  /* Wireframe Mockup Cards */
+  .wireframe-box {
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8pt;
+    line-height: 1.35;
+    margin: 10px 0 16px 0;
+    overflow-x: auto;
+    white-space: pre;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+    page-break-inside: avoid;
+  }
+
+  /* Diagram Cards */
+  .diagram-container {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 12px 0 18px 0;
+    text-align: center;
+    page-break-inside: avoid;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .diagram-caption {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* Sign-Off Table */
+  .sign-off-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    page-break-inside: avoid;
+  }
+
+  .sign-off-table td {
+    width: 33.33%;
+    border: 1px solid #94a3b8;
+    padding: 12px 14px;
+    vertical-align: top;
+    height: 110px;
+    font-size: 9pt;
+    background: #f8fafc;
+  }
+
+  .signature-line {
+    margin-top: 45px;
+    border-top: 1px dashed #64748b;
+    padding-top: 5px;
+    font-size: 8.5pt;
+    color: #475569;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'neutral',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    sequence: { useMaxWidth: true, showSequenceNumbers: true }
+  });
+</script>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover-page">
+  <div>
+    <div class="college-emblem">ABES</div>
+    <div class="college-title">ABES Engineering College</div>
+    <div class="college-sub">Ghaziabad, Uttar Pradesh &bull; College Code: 032</div>
+    <div class="college-sub">Affiliated to Dr. A.P.J. Abdul Kalam Technical University (AKTU), Lucknow</div>
+    <div class="college-dept">Department of Master of Computer Applications (MCA)</div>
+  </div>
+
+  <div>
+    <span class="doc-badge">IEEE Std 830-1998 Specification</span>
+    <div class="doc-title">Software Requirements Specification</div>
+    <div class="doc-subtitle">Outage Management and Restoration System (OMRS)</div>
+    <div class="doc-standard">A Web-Based Enterprise Monorepo for Energy &amp; Utilities Domain (Track Code: J16)</div>
+  </div>
+
+  <table class="submission-meta">
+    <tr>
+      <td class="label">Submitted By:</td>
+      <td class="val"><strong>Achal Sharma</strong></td>
+    </tr>
+    <tr>
+      <td class="label">University Roll Number:</td>
+      <td class="val"><strong>2500320140008</strong></td>
+    </tr>
+    <tr>
+      <td class="label">Degree &amp; Course:</td>
+      <td class="val">Master of Computer Applications (MCA) &mdash; 2nd Year</td>
+    </tr>
+    <tr>
+      <td class="label">Project Guide:</td>
+      <td class="val"><strong>Prof. Charshini Bandreddi</strong></td>
+    </tr>
+    <tr>
+      <td class="label">Academic Session:</td>
+      <td class="val">2026&ndash;2027</td>
+    </tr>
+    <tr>
+      <td class="label">Submission Date:</td>
+      <td class="val">21 November 2026</td>
+    </tr>
+    <tr>
+      <td class="label">Project Repository:</td>
+      <td class="val"><code>github.com/achalsharma995-create/mca2-java-outage-management-and-restoration</code></td>
+    </tr>
+  </table>
+
+  <div class="cover-footer">
+    Department of Computer Applications &bull; ABES Engineering College &bull; AKTU Lucknow
+  </div>
+</div>
+
+<!-- REVISION HISTORY & TOC -->
+<div class="page-break"></div>
+
+<h1 class="section-header">Document Revision &amp; Approval History</h1>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th>Version</th>
+      <th>Release Date</th>
+      <th>Description of Changes</th>
+      <th>Prepared By</th>
+      <th>Approved By</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>v0.1</strong></td>
+      <td>15-Sep-2026</td>
+      <td>Initial scope elicitation, domain problem definition, and high-level requirements.</td>
+      <td>Achal Sharma</td>
+      <td>Prof. Charshini Bandreddi</td>
+    </tr>
+    <tr>
+      <td><strong>v1.0</strong></td>
+      <td>30-Sep-2026</td>
+      <td>Mid-term baseline with Use Case specifications, DFD Level 0/1, and preliminary schema.</td>
+      <td>Achal Sharma</td>
+      <td>Department Committee</td>
+    </tr>
+    <tr>
+      <td><strong>v1.1</strong></td>
+      <td>21-Nov-2026</td>
+      <td>Final production-aligned SRS matching Oracle 21c XE DDL, Spring Boot 3.2.4 REST endpoints, Angular 17 UI architecture, and 18 passing JUnit 5 tests.</td>
+      <td>Achal Sharma</td>
+      <td>Prof. Charshini Bandreddi / HOD</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 class="section-header">Table of Contents</h1>
+<ol style="font-size: 10pt; line-height: 1.8;">
+  <li><strong>Introduction</strong>
+    <br>&bull; 1.1 Purpose &bull; 1.2 Scope of the System &bull; 1.3 Definitions &amp; Acronyms &bull; 1.4 References &bull; 1.5 Document Overview</li>
+  <li><strong>Overall Description</strong>
+    <br>&bull; 2.1 Product Perspective &amp; Tier Architecture &bull; 2.2 System Context Diagram &bull; 2.3 User Classes &amp; Characteristics &bull; 2.4 Operating Environment &bull; 2.5 Design Constraints &bull; 2.6 Assumptions &amp; Dependencies</li>
+  <li><strong>System Features &amp; Functional Requirements</strong>
+    <br>&bull; 3.1 Module 1: Auth &amp; Role-Based Access &bull; 3.2 Module 2: Outage Reporting &amp; Duplicate Grouping &bull; 3.3 Module 3: Crew Dispatch &amp; Work Orders &bull; 3.4 Module 4: Restoration Progress &bull; 3.5 Module 5: Customer Notifications &bull; 3.6 Module 6: Control Room Analytics</li>
+  <li><strong>External Interface Requirements</strong>
+    <br>&bull; 4.1 User Interfaces (Wireframes) &bull; 4.2 Hardware &bull; 4.3 Software &bull; 4.4 Communications</li>
+  <li><strong>Non-Functional Requirements (NFRs)</strong>
+    <br>&bull; 5.1 Performance &bull; 5.2 Security &bull; 5.3 Reliability &bull; 5.4 Maintainability</li>
+  <li><strong>System Design and Analysis Models</strong>
+    <br>&bull; 6.1 Use Case Diagram &bull; 6.2 Data Flow Diagrams (DFD 0 &amp; 1) &bull; 6.3 Entity-Relationship Diagram (ERD 3NF) &bull; 6.4 Sequence Diagram</li>
+  <li><strong>Verification &amp; Testing Matrix (18 Tests)</strong></li>
+  <li><strong>Academic Review &amp; Sign-Off</strong></li>
+</ol>
+
+<!-- SECTION 1 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">1. Introduction</h1>
+
+<h2 class="sub-header">1.1 Purpose</h2>
+<p>
+The purpose of this Software Requirements Specification (SRS) document is to provide a complete, rigorous, and verifiable specification for the <strong>Outage Management and Restoration System (OMRS)</strong> (Project Code: <strong>J16</strong>, Domain: <strong>Energy &amp; Utilities</strong>). This document serves as the formal design and evaluation baseline for the 2nd-year Master of Computer Applications (MCA) capstone project at <strong>ABES Engineering College, Ghaziabad (Affiliated to Dr. A.P.J. Abdul Kalam Technical University, Lucknow)</strong>.
+</p>
+
+<h2 class="sub-header">1.2 Scope of the System</h2>
+<p>
+Power distribution utilities consistently suffer from prolonged restoration delays, consumer frustration, and operational opacity due to manual phone logging of faults, lack of coordination between control room dispatchers and field crews, and zero real-time progress visibility.
+</p>
+<p>
+The <strong>OMRS</strong> platform automates this end-to-end lifecycle within a unified, modern web monorepo:
+</p>
+<ul>
+  <li><strong>In-Scope Capabilities:</strong> Centralized incident reporting for consumers and operators; automated duplicate incident clustering by <code>areaId</code> and <code>feederId</code>; role-based access control across 4 distinct user tiers; conflict-free crew scheduling and work order dispatching; granular progress tracking (0% to 100%) with dynamic ETR adjustments; multi-channel notification simulation stored directly in database logs; and real-time analytical KPI dashboard visualization.</li>
+  <li><strong>Out-of-Scope Boundaries:</strong> Physical hardware sensor fabrication (SCADA/AMI telemetry is abstracted via simulated REST events); paid third-party commercial SMS/Email telecom gateways (simulated in mock sandbox mode and written to Oracle database tables); and real-time GPS telemetry hardware.</li>
+  <li><strong>Measurable Objectives:</strong> Reduce mean time to dispatch (MTTD) by <strong>55%</strong>, eliminate redundant crew dispatches to identical feeder faults, and provide 100% transparent milestone updates to affected consumers.</li>
+</ul>
+
+<h2 class="sub-header">1.3 Definitions, Acronyms, and Abbreviations</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 25%;">Term / Acronym</th>
+      <th>Definition &amp; Context</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>OMRS</strong></td>
+      <td>Outage Management and Restoration System: the proposed software platform.</td>
+    </tr>
+    <tr>
+      <td><strong>IEEE Std 830-1998</strong></td>
+      <td>IEEE standard recommended practice for software requirements specifications.</td>
+    </tr>
+    <tr>
+      <td><strong>JWT &amp; RBAC</strong></td>
+      <td>JSON Web Token (RFC 7519) for stateless authorization; Role-Based Access Control.</td>
+    </tr>
+    <tr>
+      <td><strong>ETR</strong></td>
+      <td>Estimated Time of Restoration: dynamically calculated milestone completion time.</td>
+    </tr>
+    <tr>
+      <td><strong>Feeder / Substation</strong></td>
+      <td>Distribution network electrical line carrying power from a transmission substation to transformers.</td>
+    </tr>
+    <tr>
+      <td><strong>Work Order (WO)</strong></td>
+      <td>Formal repair task ticket linked to an outage incident and assigned to a specific maintenance crew.</td>
+    </tr>
+    <tr>
+      <td><strong>ojdbc11</strong></td>
+      <td>Official Oracle JDBC Type-4 driver for Java 17 interfacing with Oracle Database 21c XE.</td>
+    </tr>
+    <tr>
+      <td><strong>DTO</strong></td>
+      <td>Data Transfer Object design pattern isolating JPA entities from REST layer serialization.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">1.4 References</h2>
+<ol>
+  <li>IEEE Std 830-1998: <em>IEEE Recommended Practice for Software Requirements Specifications</em>.</li>
+  <li>Spring Boot Reference Documentation (v3.2.4), VMware Tanzu / Pivotal Software.</li>
+  <li>Angular Reference Documentation (v17+ Standalone Architecture), Google Open Source.</li>
+  <li>Oracle Database 21c Express Edition &amp; JDBC Developer's Guide (21c XE), Oracle Corporation.</li>
+  <li>MCA Capstone Curriculum &amp; J16 Workbook, Department of Computer Applications, ABES Engineering College.</li>
+</ol>
+
+<h2 class="sub-header">1.5 Document Overview</h2>
+<p>
+The document is partitioned according to IEEE standards: Section 2 delineates the operational perspective, system architecture, user personas, and constraints. Section 3 details the functional requirements across all 6 core modules with explicit REST API endpoints. Section 4 specifies external interfaces. Section 5 provides non-functional benchmarks. Section 6 presents visual UML analysis diagrams (Context, Use Case, DFD 0/1, ERD, Sequence). Section 7 reports the 18 service-layer unit tests.
+</p>
+
+<!-- SECTION 2 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">2. Overall Description</h1>
+
+<h2 class="sub-header">2.1 Product Perspective &amp; Multi-Tier Architecture</h2>
+<p>
+The system is implemented as a cloud-ready, 3-tier enterprise architecture structured within a clean monorepo:
+</p>
+<ul>
+  <li><strong>Presentation Layer:</strong> Angular 17+ standalone architecture utilizing Angular Router, Reactive Forms, functional interceptors (<code>jwtInterceptor</code>, <code>errorInterceptor</code>), and functional route guards (<code>authGuard</code>, <code>roleGuard</code>).</li>
+  <li><strong>Application Layer:</strong> Java 17 + Spring Boot 3.2.4 REST services organized into layered packages: <code>controller</code>, <code>service</code>, <code>repository</code>, <code>entity</code>, <code>dto</code>, <code>config</code>, <code>security</code>, and <code>exception</code>.</li>
+  <li><strong>Database Layer:</strong> Oracle Database 21c XE on port 1521 (<code>XEPDB1</code>) accessed via the <code>ojdbc11</code> driver, enforcing 3NF relational normalization and sequence-backed identity primary keys.</li>
+</ul>
+
+<div class="diagram-container">
+<pre class="mermaid">
+graph TD
+    subgraph Client_Tier["Client Tier (Angular 17+ / Browser)"]
+        UI_Customer["Customer Portal\n(Report & Track Outage)"]
+        UI_Engineer["Field Engineer Portal\n(Restoration & Milestones)"]
+        UI_Admin["Control Room Console\n(Dispatch & Analytics)"]
+    end
+
+    subgraph Security_Gate["Security & Gateway Tier"]
+        JWT_Filter["JwtAuthenticationFilter\n(Stateless Bearer Validation)"]
+        CORS_Config["CorsConfigurationSource\n(localhost:4200 Allowed)"]
+    end
+
+    subgraph Service_Tier["Application Tier (Spring Boot 3.2.4 REST APIs)"]
+        C_Auth["AuthController"] --> S_Auth["AuthService"]
+        C_Outage["OutageController"] --> S_Outage["OutageService"]
+        C_Crew["CrewController"] --> S_Crew["CrewService"]
+        C_WO["WorkOrderController"] --> S_WO["WorkOrderService"]
+        C_Prog["ProgressController"] --> S_Prog["RestorationProgressService"]
+        C_Notif["NotificationController"] --> S_Notif["NotificationService"]
+        C_Dash["DashboardController"] --> S_Dash["DashboardService"]
+    end
+
+    subgraph Data_Tier["Persistence Tier (Oracle Database 21c XE)"]
+        Repo["Spring Data JPA Repositories (Hibernate)"]
+        OracleDB[("Oracle 21c XE (XEPDB1)\n- USERS & ROLES\n- OUTAGES & REPORTS\n- CREWS & WORK_ORDERS\n- PROGRESS & NOTIFICATIONS")]
+    end
+
+    Client_Tier -->|HTTPS / REST JSON| Security_Gate
+    Security_Gate --> Service_Tier
+    Service_Tier --> Repo
+    Repo -->|ojdbc11 / TCP 1521| OracleDB
+</pre>
+<div class="diagram-caption">Figure 2.1: Multi-Tier Architecture of Outage Management &amp; Restoration System</div>
+</div>
+
+<h2 class="sub-header">2.2 System Context Diagram</h2>
+<div class="diagram-container">
+<pre class="mermaid">
+flowchart TD
+    Customer(("Customer / Consumer"))
+    Operator(("Control Room Operator\n(Admin)"))
+    Engineer(("Field Engineer"))
+    CrewMember(("Crew Member"))
+    NotifSink[("Notification Sink\n(Simulated SMS/Email DB Logs)")]
+
+    subgraph OMRS_Boundary["Outage Management and Restoration System (OMRS) Boundary"]
+        SystemCore["OMRS Application Core\n(Spring Boot 3 REST Services & Oracle 21c XE)"]
+    end
+
+    Customer -->|"Submit Outage Report,\nView Status & Notices"| SystemCore
+    SystemCore -->|"Outage Acknowledgement,\nETR Updates, Restored Alert"| Customer
+
+    Operator -->|"Verify Outage, Assign Crew,\nManage Work Orders, Area Broadcast"| SystemCore
+    SystemCore -->|"Real-Time KPI Dashboard,\nActive Outage Summary"| Operator
+
+    Engineer -->|"Update Milestone % (0-100),\nPost Remarks, Revise ETR"| SystemCore
+    SystemCore -->|"Assigned Work Orders,\nFeeder Fault Schematics"| Engineer
+
+    CrewMember -->|"Acknowledge Dispatch,\nMark En-Route / Arrived"| SystemCore
+    SystemCore -->|"Assigned Ticket Details"| CrewMember
+
+    SystemCore -->|"Persist Event-Driven Alerts\n& Audit Log Records"| NotifSink
+</pre>
+<div class="diagram-caption">Figure 2.2: System Context Diagram (OMRS Boundary &amp; External Actors)</div>
+</div>
+
+<h2 class="sub-header">2.3 User Classes and Characteristics</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 28%;">User Role / Persona</th>
+      <th style="width: 18%;">Technical Level</th>
+      <th>Responsibilities &amp; Access Rights</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Control Room Operator / Admin</strong> (<code>ROLE_ADMIN</code>)</td>
+      <td>High</td>
+      <td>Complete operational access: verifies outage reports, manages crews, dispatches work orders, broadcasts area emergency alerts, and monitors real-time KPI dashboards.</td>
+    </tr>
+    <tr>
+      <td><strong>Field Engineer</strong> (<code>ROLE_FIELD_ENGINEER</code>)</td>
+      <td>Intermediate</td>
+      <td>Views assigned work orders, logs restoration milestones (0% to 100%), updates technical remarks, revises ETR, and auto-closes incidents.</td>
+    </tr>
+    <tr>
+      <td><strong>Customer / Consumer</strong> (<code>ROLE_CUSTOMER</code>)</td>
+      <td>Basic</td>
+      <td>Reports localized outages with area/feeder details, tracks real-time restoration progress, and views personalized notification alert feeds.</td>
+    </tr>
+    <tr>
+      <td><strong>Crew Member</strong> (<code>ROLE_CREW_MEMBER</code>)</td>
+      <td>Basic</td>
+      <td>View-only access to assigned work orders, vehicle assignments, and site location remarks.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">2.4 Operating Environment</h2>
+<ul>
+  <li><strong>Client Environment:</strong> Modern standards-compliant browser (Google Chrome &ge; 110, Microsoft Edge &ge; 110, Mozilla Firefox &ge; 108); desktop &ge; 1366&times;768, responsive mobile down to 360&times;640.</li>
+  <li><strong>Server Environment:</strong> Java 17 LTS, Spring Boot 3.2.4, Apache Maven 3.9+, Node.js v18+ / npm v10+.</li>
+  <li><strong>Database Tier:</strong> Oracle Database 21c Express Edition (XE); Service: <code>XEPDB1</code>; Port: 1521.</li>
+</ul>
+
+<h2 class="sub-header">2.5 Design and Implementation Constraints</h2>
+<ol>
+  <li><strong>Architectural Separation:</strong> Strict MVC + DTO architecture. JPA Entities are never exposed over REST endpoints directly.</li>
+  <li><strong>Cryptographic Security:</strong> Passwords stored exclusively as salted BCrypt hashes (strength 10). Stateless authentication enforced via signed JJWT tokens (HS256).</li>
+  <li><strong>Relational Normalization:</strong> Database schema strictly normalized to Third Normal Form (3NF) to eliminate data redundancy.</li>
+  <li><strong>Dispatch Safety:</strong> The dispatch engine must strictly reject assigning any crew marked <code>DISPATCHED</code> or <code>ON_DUTY</code> to an active work order.</li>
+</ol>
+
+<!-- SECTION 3 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">3. System Features &amp; Functional Requirements</h1>
+
+<h2 class="sub-header">3.1 Module 1: Authentication &amp; Role-Based Access Governance</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 12%;">Req ID</th>
+      <th style="width: 25%;">Feature</th>
+      <th>Processing Logic &amp; Validation Rules</th>
+      <th style="width: 28%;">REST Endpoint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-1.1</strong></td>
+      <td>User Registration</td>
+      <td>Validates unique username, RFC email format, and password (&ge; 6 characters). Assigns default <code>ROLE_CUSTOMER</code>.</td>
+      <td><code>POST /api/auth/register</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-1.2</strong></td>
+      <td>Secure JWT Login</td>
+      <td>Authenticates credentials against BCrypt hash; generates signed HS256 JWT bearer token containing user ID, username, and roles.</td>
+      <td><code>POST /api/auth/login</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-1.3</strong></td>
+      <td>Token Management</td>
+      <td>Token lifetime set to 7,200 seconds (120 minutes). Expired or tampered tokens return <code>401 Unauthorized</code>.</td>
+      <td>Header: <code>Bearer &lt;token&gt;</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-1.4</strong></td>
+      <td>Role Route Guards</td>
+      <td>Angular functional guards (<code>authGuard</code>, <code>roleGuard</code>) protect client views according to JWT role claims.</td>
+      <td>Client Router</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">3.2 Module 2: Outage Detection, Reporting &amp; Duplicate Grouping</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 12%;">Req ID</th>
+      <th style="width: 25%;">Feature</th>
+      <th>Processing Logic &amp; Validation Rules</th>
+      <th style="width: 28%;">REST Endpoint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-2.1</strong></td>
+      <td>Report New Outage</td>
+      <td>Requires <code>areaId</code>, <code>feederId</code>, <code>severity</code> (LOW, MEDIUM, HIGH, CRITICAL), and description. Generates <code>OUT-YYYY-XXXX</code> code.</td>
+      <td><code>POST /api/outages/report</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-2.2</strong></td>
+      <td>Duplicate Grouping</td>
+      <td>Checks active incidents for the same area and feeder. If found, groups incoming report under the active incident and increments <code>report_count</code>.</td>
+      <td>System Automatic Logic</td>
+    </tr>
+    <tr>
+      <td><strong>FR-2.3</strong></td>
+      <td>Outage Verification</td>
+      <td>Control Room Operator verifies incident; advances status from <code>REPORTED</code> &rarr; <code>VERIFIED</code>.</td>
+      <td><code>PUT /api/outages/{id}/verify</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-2.4</strong></td>
+      <td>Search &amp; Filter</td>
+      <td>Multi-parameter filtering by area, feeder, status, and severity with server-side pagination.</td>
+      <td><code>GET /api/outages</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-2.5</strong></td>
+      <td>Status Lifecycle</td>
+      <td>Enforces valid state machine: <code>REPORTED</code> &rarr; <code>VERIFIED</code> &rarr; <code>IN_PROGRESS</code> &rarr; <code>RESTORED</code>.</td>
+      <td><code>PUT /api/outages/{id}/status</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">3.3 Module 3: Crew Dispatch &amp; Work Order Management</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 12%;">Req ID</th>
+      <th style="width: 25%;">Feature</th>
+      <th>Processing Logic &amp; Validation Rules</th>
+      <th style="width: 28%;">REST Endpoint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-3.1</strong></td>
+      <td>Crew Inventory CRUD</td>
+      <td>Manages repair crews (crew name, code, vehicle number, team members count, base area ID).</td>
+      <td><code>POST /api/crews</code><br><code>GET /api/crews</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-3.2</strong></td>
+      <td>Query Available Crews</td>
+      <td>Filters crews whose status is <code>AVAILABLE</code>. Excludes <code>DISPATCHED</code> or <code>ON_DUTY</code> crews.</td>
+      <td><code>GET /api/crews/available</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-3.3</strong></td>
+      <td>Work Order Creation</td>
+      <td>Creates a work order (<code>WO-YYYY-XXXX</code>) linked to a verified outage with assigned priority and target duration.</td>
+      <td><code>POST /api/work-orders</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-3.4</strong></td>
+      <td>Crew Dispatch Logic</td>
+      <td>Assigns available crew to work order. Sets WO status to <code>ASSIGNED</code> and flips crew status to <code>DISPATCHED</code>. Throws <code>BadRequestException</code> if crew is busy.</td>
+      <td><code>POST /api/work-orders/{id}/assign</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-3.5</strong></td>
+      <td>Work Order Lifecycle</td>
+      <td>Enforces status progression: <code>CREATED</code> &rarr; <code>ASSIGNED</code> &rarr; <code>EN_ROUTE</code> &rarr; <code>WORKING</code> &rarr; <code>COMPLETED</code>.</td>
+      <td><code>PUT /api/work-orders/{id}/status</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">3.4 Module 4: Restoration Progress Tracking &amp; Auto-Closure</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 12%;">Req ID</th>
+      <th style="width: 25%;">Feature</th>
+      <th>Processing Logic &amp; Validation Rules</th>
+      <th style="width: 28%;">REST Endpoint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-4.1</strong></td>
+      <td>Log Milestone Update</td>
+      <td>Field Engineer submits milestone percentage (0&ndash;100%), technical remarks, and status reached.</td>
+      <td><code>POST /api/restoration/updates</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-4.2</strong></td>
+      <td>Chronological Timeline</td>
+      <td>Fetches ordered history of all milestone updates recorded for an outage incident.</td>
+      <td><code>GET /api/restoration/outage/{id}/timeline</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-4.3</strong></td>
+      <td>Dynamic ETR Update</td>
+      <td>Revising the Estimated Time of Restoration automatically triggers notifications to affected consumers.</td>
+      <td><code>PUT /api/restoration/outage/{id}/etr</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-4.4</strong></td>
+      <td>Automated Closure</td>
+      <td>Upon 100% completion &amp; WO marked <code>COMPLETED</code>: 1) Outage status becomes <code>RESTORED</code>; 2) <code>actual_restore_time</code> set; 3) duration calculated; 4) assigned crew reset to <code>AVAILABLE</code>.</td>
+      <td>Automatic upon 100% Milestone</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">3.5 Module 5: Customer Notification &amp; Communication</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 12%;">Req ID</th>
+      <th style="width: 25%;">Feature</th>
+      <th>Processing Logic &amp; Validation Rules</th>
+      <th style="width: 28%;">REST Endpoint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-5.1</strong></td>
+      <td>Template Engine</td>
+      <td>Replaces placeholders (<code>{outageNumber}</code>, <code>{areaName}</code>, <code>{etr}</code>) from templates on status changes.</td>
+      <td>System Automatic Logic</td>
+    </tr>
+    <tr>
+      <td><strong>FR-5.2</strong></td>
+      <td>Alert Persistence</td>
+      <td>Stores alert records in the <code>NOTIFICATIONS</code> table with channels (<code>SMS</code>, <code>EMAIL</code>, <code>IN_APP</code>) and status <code>SENT</code>.</td>
+      <td>Database Persistence</td>
+    </tr>
+    <tr>
+      <td><strong>FR-5.3</strong></td>
+      <td>Customer Alert Feed</td>
+      <td>Consumers view historical alerts mapped to their user account and registered meters.</td>
+      <td><code>GET /api/notifications/my</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-5.4</strong></td>
+      <td>Area Broadcast</td>
+      <td>Operator broadcasts emergency notices to all consumers mapped to a target <code>areaId</code>.</td>
+      <td><code>POST /api/notifications/broadcast</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub-header">3.6 Module 6: Control Room Analytics &amp; OpenAPI Documentation</h2>
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 12%;">Req ID</th>
+      <th style="width: 25%;">Feature</th>
+      <th>Processing Logic &amp; Validation Rules</th>
+      <th style="width: 28%;">REST Endpoint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-6.1</strong></td>
+      <td>Live KPI Metrics</td>
+      <td>Returns live aggregate counts: Active Outages, Available Crews, Restored Today, and Pending Alerts.</td>
+      <td><code>GET /api/dashboard/stats</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-6.2</strong></td>
+      <td>Area Feeder Lookups</td>
+      <td>Supplies reference dropdown data for areas, substations, and feeders.</td>
+      <td><code>GET /api/lookup/areas</code><br><code>GET /api/lookup/feeders</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-6.3</strong></td>
+      <td>Interactive Swagger</td>
+      <td>Full OpenAPI 3.0 interactive test explorer rendered via SpringDoc.</td>
+      <td><code>/swagger-ui.html</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION 4 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">4. External Interface Requirements</h1>
+
+<h2 class="sub-header">4.1 User Interfaces (UI Wireframes &amp; Layouts)</h2>
+
+<h3 class="sub-sub-header">1. Authentication Portal Wireframe (/login)</h3>
+<div class="wireframe-box">+-----------------------------------------------------------------------------------+
+|                           GridFlow OMRS - Portal Login                            |
+|             Outage Management and Restoration System &bull; ABES MCA Track J16         |
++-----------------------------------------------------------------------------------+
+|                                                                                   |
+|                   [ Username / Email:   ________________________ ]                |
+|                   [ Password:           ________________________ ]                |
+|                                                                                   |
+|                   [         SIGN IN TO CONTROL PLATFORM        ]                |
+|                                                                                   |
+|   Quick Demo Evaluator Credentials:                                               |
+|   [ Control Room Admin ]       [ Field Engineer ]       [ Consumer / Customer ]   |
+|   User: admin / password       User: engineer_vikram    User: rajesh_sharma       |
++-----------------------------------------------------------------------------------+</div>
+
+<h3 class="sub-sub-header">2. Control Room Operational Dashboard (/dashboard)</h3>
+<div class="wireframe-box">+-----------------------------------------------------------------------------------+
+| [GridFlow OMRS]   Outages | Work Orders | Crews | Restoration | Alerts    (admin) |
++-----------------------------------------------------------------------------------+
+|  +--------------------+ +--------------------+ +--------------------+ +---------+ |
+|  | ACTIVE OUTAGES:  3 | | CREWS READY:     5 | | RESTORED TODAY:  4 | | ALERTS:6| |
+|  +--------------------+ +--------------------+ +--------------------+ +---------+ |
+|                                                                                   |
+|  Quick Actions:  [+ Report Outage]   [Dispatch Work Order]   [Broadcast Area]    |
+|                                                                                   |
+|  Active Incidents Grid:                                                           |
+|  Incident ID    Area Name      Feeder ID   Severity  Status       Dupl.  Actions  |
+|  OUT-2026-0001  Downtown       FDR-DT-01   CRITICAL  IN_PROGRESS  (3)    [Track]  |
+|  OUT-2026-0002  Ind. Estate    FDR-IND-01  HIGH      VERIFIED     (1)    [Assign] |
+|  OUT-2026-0003  Suburb East    FDR-SE-02   MEDIUM    REPORTED     (1)    [Verify] |
++-----------------------------------------------------------------------------------+</div>
+
+<h3 class="sub-sub-header">3. Restoration Progress Tracker (/restoration)</h3>
+<div class="wireframe-box">+-----------------------------------------------------------------------------------+
+| Outage: OUT-2026-0001 | Substation: Downtown Central (FDR-DT-01)                  |
+| Current Progress: [============================== 75% -----------------]         |
+| Assigned Crew: CREW-DT-ALPHA (Lead: Vikram Sharma) | ETR: 2026-11-23 14:00        |
++-----------------------------------------------------------------------------------+
+| Post Milestone Update:                                                            |
+| Milestone %: [  75%  ]  Status: [ WORKING             v ]                         |
+| Remarks:     [ Transformer bushing replaced; commencing safety insulation tests ] |
+| [ SUBMIT PROGRESS MILESTONE ]                                                     |
+|                                                                                   |
+| Chronological Progress Timeline:                                                  |
+| &bull; 12:45 PM | 75% | Transformer bushing replaced; commencing safety test (Vikram) |
+| &bull; 11:30 AM | 40% | Damaged insulator isolated, replacement unit hoisted (Vikram) |
+| &bull; 10:15 AM | 10% | Crew arrived at Site Substation DT-A (Vikram)                 |
++-----------------------------------------------------------------------------------+</div>
+
+<h2 class="sub-header">4.2 Hardware Interfaces</h2>
+<p>
+Standard I/O peripherals (Keyboard, Mouse, Display &ge; 720p). Mobile and tablet devices for Field Engineers supported through responsive browser viewports down to 360&times;640. No embedded microcontroller hardware is required for this software baseline.
+</p>
+
+<h2 class="sub-header">4.3 Software Interfaces</h2>
+<ul>
+  <li><strong>Database Connector:</strong> Spring Data JPA / Hibernate 6 over JDBC Type-4 driver (<code>ojdbc11</code>) connecting to Oracle Database 21c XE on port 1521 (<code>jdbc:oracle:thin:@localhost:1521/XEPDB1</code>).</li>
+  <li><strong>Security Provider:</strong> Spring Security 6.2 and JJWT (version 0.12.5) implementing HMAC-SHA256 signature verification.</li>
+  <li><strong>Documentation:</strong> SpringDoc OpenAPI Starter WebMVC UI (version 2.4.0) hosting Swagger endpoints at <code>/swagger-ui.html</code>.</li>
+</ul>
+
+<h2 class="sub-header">4.4 Communications Interfaces</h2>
+<ul>
+  <li><strong>Network Protocol:</strong> HTTP/1.1 and HTTPS (TLS 1.3).</li>
+  <li><strong>Data Interchange:</strong> All payloads serialized strictly as UTF-8 encoded <code>application/json</code>.</li>
+  <li><strong>CORS Policy:</strong> Configured to explicitly permit origins from <code>http://localhost:4200</code> with HTTP verbs <code>GET, POST, PUT, DELETE, OPTIONS</code>.</li>
+</ul>
+
+<!-- SECTION 5 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">5. Non-Functional Requirements (NFRs)</h1>
+
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 25%;">NFR Category</th>
+      <th style="width: 35%;">Target Metric / Standard</th>
+      <th>Implementation &amp; Verification Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>5.1 Performance</strong></td>
+      <td>Page load latency &lt; 2.0s; API response time &lt; 300ms under 50 concurrent requests.</td>
+      <td>Connection pooling via HikariCP, composite B-tree indexes on Oracle tables <code>(area_id, feeder_id, status)</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>5.2 Security</strong></td>
+      <td>Zero plain-text passwords; stateless token-based authorization; OWASP SQL injection immunity.</td>
+      <td>BCrypt password hashing (strength 10), JJWT HS256 filter, Spring Data JPA parameterized queries.</td>
+    </tr>
+    <tr>
+      <td><strong>5.3 Reliability</strong></td>
+      <td>System availability &ge; 99.5%; transactional integrity during multi-table updates.</td>
+      <td><code>@Transactional</code> boundaries on all service updates; standard JSON error format via <code>@ControllerAdvice</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>5.4 Maintainability</strong></td>
+      <td>Layered modular design; cross-browser portability.</td>
+      <td>Strict separation of controller, service, repository, and DTO layers; Angular responsive flexbox design.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION 6 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">6. System Design and Analysis Models</h1>
+
+<h2 class="sub-header">6.1 Use Case Diagram &amp; Actor Matrix</h2>
+<div class="diagram-container">
+<pre class="mermaid">
+flowchart LR
+    subgraph Actors["System Actors"]
+        Admin(("Control Room Operator\n(Admin)"))
+        Engineer(("Field Engineer"))
+        Customer(("Customer / Consumer"))
+    end
+
+    subgraph OMRS_UseCases["OMRS Use Case Boundary"]
+        UC1(["UC-1: Register / Authenticate (JWT)"])
+        UC2(["UC-2: Report Power Outage"])
+        UC3(["UC-3: Verify Outage & Group Duplicates"])
+        UC4(["UC-4: Create Work Order & Dispatch Crew"])
+        UC5(["UC-5: Log Restoration Milestones (0-100%)"])
+        UC6(["UC-6: Update ETR & Auto-Close Outage"])
+        UC7(["UC-7: Receive & View Notifications"])
+        UC8(["UC-8: Broadcast Area Emergency Alert"])
+        UC9(["UC-9: View KPI Analytics Dashboard"])
+    end
+
+    Customer --> UC1
+    Customer --> UC2
+    Customer --> UC7
+
+    Engineer --> UC1
+    Engineer --> UC5
+    Engineer --> UC6
+
+    Admin --> UC1
+    Admin --> UC3
+    Admin --> UC4
+    Admin --> UC8
+    Admin --> UC9
+</pre>
+<div class="diagram-caption">Figure 6.1: UML Use Case Diagram for Outage Management and Restoration System</div>
+</div>
+
+<h2 class="sub-header">6.2 Data Flow Diagrams (DFD)</h2>
+
+<h3 class="sub-sub-header">6.2.1 Level 0: Context Level Diagram</h3>
+<div class="diagram-container">
+<pre class="mermaid">
+flowchart TD
+    Customer(["Customer"])
+    Admin(["Control Room Operator"])
+    Engineer(["Field Engineer"])
+
+    System["0.0\nOutage Management and\nRestoration System (OMRS)"]
+
+    DB[(Oracle 21c XE\nDatabase)]
+
+    Customer -->|Outage Details & Contact| System
+    System -->|Incident Reference & Alerts| Customer
+
+    Admin -->|Verification, Crew Dispatch, Broadcast| System
+    System -->|KPI Metrics & Operational Grid| Admin
+
+    Engineer -->|Milestone Progress & ETR Updates| System
+    System -->|Assigned Work Order Details| Engineer
+
+    System <-->|Read / Write Relational Data| DB
+</pre>
+<div class="diagram-caption">Figure 6.2: DFD Level 0 (Context Level Diagram)</div>
+</div>
+
+<h3 class="sub-sub-header">6.2.2 Level 1: Modular Functional Decomposition</h3>
+<div class="diagram-container">
+<pre class="mermaid">
+flowchart TD
+    User["Users (All Roles)"]
+    D_Users[("USERS & ROLES")]
+    D_Outages[("OUTAGES & REPORTS")]
+    D_Crews[("CREWS & WORK_ORDERS")]
+    D_Notifs[("NOTIFICATIONS")]
+
+    P1["1.0\nAuthentication &\nToken Issuance"]
+    P2["2.0\nOutage Ingestion &\nDuplicate Grouping"]
+    P3["3.0\nCrew Dispatch &\nWork Order Allocation"]
+    P4["4.0\nRestoration Progress\n& Auto-Closure"]
+    P5["5.0\nCustomer Notification\n& Broadcast Engine"]
+
+    User -->|Credentials| P1
+    P1 <-->|Verify Password & Role| D_Users
+    P1 -->|JWT Token| User
+
+    User -->|Outage Report| P2
+    P2 <-->|Check Existing Feeder Incident| D_Outages
+    P2 -->|Outage Incident Event| P5
+
+    P2 -->|Verified Outage Ticket| P3
+    P3 <-->|Check Available Crew| D_Crews
+    P3 -->|Dispatch Event| P5
+
+    P3 -->|Active Work Order| P4
+    P4 <-->|Update % & Timeline| D_Outages
+    P4 <-->|Complete WO & Free Crew| D_Crews
+    P4 -->|Restoration Completed Event| P5
+
+    P5 <-->|Generate & Save Notice| D_Notifs
+    P5 -->|Alert Feed| User
+</pre>
+<div class="diagram-caption">Figure 6.3: DFD Level 1 (Modular Functional Decomposition)</div>
+</div>
+
+<!-- SECTION 6 Continued -->
+<div class="page-break"></div>
+
+<h2 class="sub-header">6.3 Entity-Relationship Diagram (ERD &mdash; Crow's Foot 3NF Schema)</h2>
+<div class="diagram-container">
+<pre class="mermaid">
+erDiagram
+    ROLES ||--o{ USER_ROLES : "assigned to"
+    USERS ||--o{ USER_ROLES : "has"
+    USERS ||--o{ CUSTOMERS : "registered profile"
+    USERS ||--o{ OUTAGES : "created by"
+    USERS ||--o{ CREWS : "lead engineer"
+    USERS ||--o{ CREW_MEMBERS : "crew member user"
+    USERS ||--o{ WORK_ORDERS : "created by"
+    USERS ||--o{ PROGRESS_UPDATES : "logged by"
+    USERS ||--o{ NOTIFICATIONS : "recipient"
+
+    AREAS ||--o{ FEEDERS : "contains"
+    AREAS ||--o{ CUSTOMERS : "located in"
+    AREAS ||--o{ OUTAGES : "affected area"
+    AREAS ||--o{ OUTAGE_REPORTS : "reported area"
+    AREAS ||--o{ CREWS : "base station"
+    AREAS ||--o{ NOTIFICATIONS : "broadcast target"
+
+    FEEDERS ||--o{ CUSTOMERS : "powers"
+    FEEDERS ||--o{ OUTAGES : "faulted feeder"
+    FEEDERS ||--o{ OUTAGE_REPORTS : "reported feeder"
+
+    CUSTOMERS ||--o{ OUTAGE_REPORTS : "submits"
+    CUSTOMERS ||--o{ NOTIFICATIONS : "customer alerts"
+
+    OUTAGES ||--o{ OUTAGE_REPORTS : "groups duplicate"
+    OUTAGES ||--o{ WORK_ORDERS : "resolved by"
+    OUTAGES ||--o{ PROGRESS_UPDATES : "tracked by"
+    OUTAGES ||--o{ NOTIFICATIONS : "generates alerts"
+
+    CREWS ||--o{ CREW_MEMBERS : "comprises"
+    CREWS ||--o{ WORK_ORDERS : "assigned to"
+
+    WORK_ORDERS ||--o{ PROGRESS_UPDATES : "milestone progress"
+
+    NOTIFICATION_TEMPLATES ||--o{ NOTIFICATIONS : "formatted with"
+
+    USERS {
+        NUMBER user_id PK
+        VARCHAR username UK
+        VARCHAR email UK
+        VARCHAR password
+        VARCHAR full_name
+        VARCHAR phone_number
+        NUMBER is_active
+        TIMESTAMP created_at
+    }
+
+    ROLES {
+        NUMBER role_id PK
+        VARCHAR name UK
+        VARCHAR description
+    }
+
+    AREAS {
+        NUMBER area_id PK
+        VARCHAR area_code UK
+        VARCHAR area_name
+        VARCHAR region
+        VARCHAR city
+        NUMBER total_customers
+    }
+
+    FEEDERS {
+        NUMBER feeder_id PK
+        VARCHAR feeder_code UK
+        VARCHAR feeder_name
+        NUMBER area_id FK
+        VARCHAR substation_name
+        NUMBER capacity_kva
+        VARCHAR voltage_level
+        VARCHAR status
+    }
+
+    CUSTOMERS {
+        NUMBER customer_id PK
+        NUMBER user_id FK
+        VARCHAR account_number UK
+        VARCHAR full_name
+        VARCHAR phone_number
+        VARCHAR service_address
+        VARCHAR meter_number UK
+        NUMBER area_id FK
+        NUMBER feeder_id FK
+        VARCHAR customer_type
+    }
+
+    OUTAGES {
+        NUMBER outage_id PK
+        VARCHAR outage_number UK
+        VARCHAR title
+        NUMBER area_id FK
+        NUMBER feeder_id FK
+        VARCHAR severity
+        VARCHAR status
+        VARCHAR outage_type
+        TIMESTAMP reported_at
+        TIMESTAMP estimated_restore_time
+        TIMESTAMP actual_restore_time
+        NUMBER restoration_duration_minutes
+        NUMBER affected_customers_count
+        VARCHAR root_cause
+        NUMBER report_count
+    }
+
+    CREWS {
+        NUMBER crew_id PK
+        VARCHAR crew_code UK
+        VARCHAR crew_name
+        NUMBER lead_engineer_id FK
+        VARCHAR vehicle_number
+        VARCHAR availability_status
+        NUMBER base_area_id FK
+        NUMBER members_count
+    }
+
+    WORK_ORDERS {
+        NUMBER work_order_id PK
+        VARCHAR wo_number UK
+        NUMBER outage_id FK
+        NUMBER crew_id FK
+        VARCHAR priority
+        VARCHAR status
+        TIMESTAMP assigned_at
+        TIMESTAMP completed_at
+        NUMBER estimated_duration_minutes
+    }
+
+    PROGRESS_UPDATES {
+        NUMBER update_id PK
+        NUMBER work_order_id FK
+        NUMBER outage_id FK
+        NUMBER engineer_id FK
+        NUMBER percentage_complete
+        VARCHAR status_reached
+        VARCHAR remarks
+        TIMESTAMP updated_at
+    }
+
+    NOTIFICATIONS {
+        NUMBER notification_id PK
+        NUMBER user_id FK
+        NUMBER customer_id FK
+        NUMBER outage_id FK
+        VARCHAR event_type
+        VARCHAR title
+        VARCHAR message
+        VARCHAR channel
+        VARCHAR status
+        TIMESTAMP sent_at
+    }
+</pre>
+<div class="diagram-caption">Figure 6.4: Entity-Relationship Diagram (Normalized 3NF Oracle 21c XE Relational Schema)</div>
+</div>
+
+<h2 class="sub-header">6.4 Sequence Diagram: End-to-End Restoration Lifecycle</h2>
+<div class="diagram-container">
+<pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer as Customer / Consumer
+    actor Operator as Control Room Operator
+    actor Engineer as Field Engineer
+    participant Angular as Angular 17 UI
+    participant Backend as Spring Boot REST API
+    participant DB as Oracle 21c XE
+
+    Customer->>Angular: Fill Outage Form (Area, Feeder, Severity)
+    Angular->>Backend: POST /api/outages/report
+    Backend->>DB: Check active outage on Area + Feeder
+    alt Duplicate Outage Exists
+        Backend->>DB: Increment report_count on existing OUT-XXXX
+        Backend-->>Angular: 200 OK (Attached to existing Outage)
+    else New Outage Incident
+        Backend->>DB: INSERT into OUTAGES (status='REPORTED')
+        Backend->>DB: INSERT notification log
+        Backend-->>Angular: 201 Created (New OUT-2026-YYYY)
+    end
+
+    Operator->>Angular: Review Incident & Click "Verify Outage"
+    Angular->>Backend: PUT /api/outages/{id}/verify
+    Backend->>DB: UPDATE OUTAGES SET status='VERIFIED'
+    Backend-->>Angular: 200 OK
+
+    Operator->>Angular: Select Available Crew & Assign Work Order
+    Angular->>Backend: POST /api/work-orders/{id}/assign (crewId=3)
+    Backend->>DB: Verify Crew 3 status == 'AVAILABLE'
+    Backend->>DB: INSERT WORK_ORDERS & UPDATE CREWS SET availability='DISPATCHED'
+    Backend->>DB: Trigger Notification ("Crew Dispatched")
+    Backend-->>Angular: 200 OK (Work Order ASSIGNED)
+
+    Engineer->>Angular: Log Milestone Progress (40%, Remarks)
+    Angular->>Backend: POST /api/restoration/updates
+    Backend->>DB: INSERT PROGRESS_UPDATES (percentage=40)
+    Backend-->>Angular: 200 OK
+
+    Engineer->>Angular: Log Final Milestone (100%, Status='COMPLETED')
+    Angular->>Backend: POST /api/restoration/updates (percentage=100)
+    Backend->>DB: INSERT PROGRESS_UPDATES
+    Backend->>DB: UPDATE WORK_ORDERS SET status='COMPLETED'
+    Backend->>DB: UPDATE OUTAGES SET status='RESTORED', actual_restore_time=CURRENT_TIMESTAMP
+    Backend->>DB: UPDATE CREWS SET availability='AVAILABLE'
+    Backend->>DB: Trigger Notification ("Power Restored")
+    Backend-->>Angular: 200 OK (Incident Auto-Closed)
+    Backend-->>Customer: Real-Time Power Restored Alert
+</pre>
+<div class="diagram-caption">Figure 6.5: UML Sequence Diagram: Outage Report &rarr; Crew Dispatch &rarr; Restoration &rarr; Auto-Close</div>
+</div>
+
+<!-- SECTION 7 & 8 -->
+<div class="page-break"></div>
+
+<h1 class="section-header">7. Verification &amp; Testing Matrix</h1>
+<p>
+The backend service layer is validated with <strong>18 comprehensive JUnit 5 and Mockito unit tests</strong> (3 tests per functional module) executing against mock repository dependencies with <strong>100% test passage</strong>:
+</p>
+
+<table class="content-table">
+  <thead>
+    <tr>
+      <th style="width: 14%;">Module</th>
+      <th style="width: 26%;">Test Class</th>
+      <th>Verification Objective</th>
+      <th style="width: 12%;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Auth</strong></td>
+      <td><code>AuthServiceTest</code></td>
+      <td>Authenticate valid user &amp; generate signed JWT bearer token</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Auth</strong></td>
+      <td><code>AuthServiceTest</code></td>
+      <td>Authenticate with invalid password (triggers BadCredentialsException)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Auth</strong></td>
+      <td><code>AuthServiceTest</code></td>
+      <td>Register with duplicate username (triggers BadRequestException)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Outage</strong></td>
+      <td><code>OutageServiceTest</code></td>
+      <td>Report brand-new outage in clear area (unique OUT-2026-XXXX created)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Outage</strong></td>
+      <td><code>OutageServiceTest</code></td>
+      <td>Report outage on area with active incident (grouped into parent incident)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Outage</strong></td>
+      <td><code>OutageServiceTest</code></td>
+      <td>Update status to RESTORED (calculates elapsed duration &amp; notifies)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Crew</strong></td>
+      <td><code>CrewServiceTest</code></td>
+      <td>Create crew with base area and lead (crew saved with status AVAILABLE)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Crew</strong></td>
+      <td><code>CrewServiceTest</code></td>
+      <td>Create crew with duplicate crew code (duplicate rejected)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Crew</strong></td>
+      <td><code>CrewServiceTest</code></td>
+      <td>Query available crews for dispatch (returns only non-busy crews)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>WorkOrder</strong></td>
+      <td><code>WorkOrderServiceTest</code></td>
+      <td>Assign available crew to work order (status ASSIGNED, crew DISPATCHED)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>WorkOrder</strong></td>
+      <td><code>WorkOrderServiceTest</code></td>
+      <td>Assign busy crew (DISPATCHED status) (collision rejected via exception)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>WorkOrder</strong></td>
+      <td><code>WorkOrderServiceTest</code></td>
+      <td>Advance work order status to COMPLETED (crew freed, outage auto-closed)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Progress</strong></td>
+      <td><code>RestorationProgressServiceTest</code></td>
+      <td>Add milestone percentage (40%) (milestone saved, ETR updated)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Progress</strong></td>
+      <td><code>RestorationProgressServiceTest</code></td>
+      <td>Post 100% completion milestone (auto-closes outage to RESTORED)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Progress</strong></td>
+      <td><code>RestorationProgressServiceTest</code></td>
+      <td>Query outage chronological timeline (ordered ascending milestone history)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Notification</strong></td>
+      <td><code>NotificationServiceTest</code></td>
+      <td>Trigger event notification from template (replaces tokens &amp; saves notice)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Notification</strong></td>
+      <td><code>NotificationServiceTest</code></td>
+      <td>Control Room manual area broadcast (notices sent to all area meters)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Notification</strong></td>
+      <td><code>NotificationServiceTest</code></td>
+      <td>Mark customer notification as read (sets read_at timestamp in Oracle)</td>
+      <td><span class="badge-pass">PASSED</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 class="section-header">8. Academic Review &amp; Sign-Off</h1>
+<p>
+This Software Requirements Specification document has been compiled and verified against the actual working codebase of the <strong>Outage Management and Restoration System (OMRS)</strong>. It is hereby submitted for formal evaluation and project review for the degree of <strong>Master of Computer Applications (MCA)</strong> at <strong>ABES Engineering College, Ghaziabad</strong>.
+</p>
+
+<table class="sign-off-table">
+  <tr>
+    <td>
+      <strong>Project Guide</strong><br>
+      <span style="font-size: 8pt; color: #64748b;">Prof. Charshini Bandreddi<br>Assistant Professor, Dept of MCA</span>
+      <div class="signature-line">Signature &amp; Date</div>
+    </td>
+    <td>
+      <strong>Internal Examiner</strong><br>
+      <span style="font-size: 8pt; color: #64748b;">Department Evaluation Committee<br>ABES Engineering College</span>
+      <div class="signature-line">Signature &amp; Date</div>
+    </td>
+    <td>
+      <strong>Head of Department (HOD)</strong><br>
+      <span style="font-size: 8pt; color: #64748b;">Department of Computer Applications<br>ABES Engineering College, Ghaziabad</span>
+      <div class="signature-line">Signature &amp; Date</div>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
